@@ -1,0 +1,283 @@
+@font-face {
+  font-family: 'DINCondensed';
+  src: url('@/assets/fonts/DINCondensedBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.inviteOverlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  background: #14141426;
+  padding: 16px;
+}
+
+.inviteModalWrapperWin {
+  width: 488px;
+  height: 586px;
+  background: url('@/assets/images/invitation-bg.png') no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  animation: popIn 200ms ease-out;
+}
+.inviteModalWrapperMac {
+  width: 520px;
+  height: 610px;
+  background: url('@/assets/images/invitation-bg.png') no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  .inviteModal {
+    width: 432px;
+  }
+  animation: popIn 200ms ease-out;
+}
+.inviteModal {
+  position: relative;
+  width: 430px;
+  height: auto;
+
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 80px 28px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inviteCloseButton {
+  position: absolute;
+  top: 74px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 16px;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover {
+    background: rgba(15, 23, 42, 0.2);
+    color: rgba(15, 23, 42, 0.9);
+  }
+}
+.inviteCloseIcon {
+  width: 20px;
+  height: 20px;
+}
+.inviteHeader {
+  text-align: center;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.inviteTitleIcon {
+  width: 176px;
+  height: auto;
+}
+
+.inviteSubtitle {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.inviteStats {
+  border-radius: 16px;
+  padding: 40px 18px;
+  padding-bottom: 12px;
+  display: grid;
+  grid-template-columns: auto 0.1fr auto;
+  align-items: center;
+  gap: 40px;
+  color: #333;
+}
+
+.inviteStatItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.inviteStatIcon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.inviteStatText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  svg {
+    width: 16px;
+    height: 16px;
+    margin-bottom: -3px;
+  }
+}
+.inviteStatIcon {
+  margin-top: -2px;
+}
+
+.inviteStatLabel {
+  color: #333333;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+}
+
+.inviteStatValue {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 100%;
+  margin-top: -1px;
+}
+
+.inviteStatDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(15, 23, 42, 0.12);
+}
+
+.inviteCodeBlock {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inviteCodeLabelRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.inviteCodeIcon {
+  flex-shrink: 0;
+  width: 232px;
+  height: 15px;
+}
+
+.inviteCodeLabel {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.inviteCode {
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 48px;
+  letter-spacing: 10px;
+  font-family: 'DINCondensed', 'DIN Condensed', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  margin-top: 16px;
+}
+
+.inviteCopyButton {
+  align-self: center;
+  width: 156px;
+  padding: 13px 0;
+  border-radius: 20px;
+  background: #111111;
+  color: #ffffff;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition:
+    transform 0.12s ease,
+    background 0.2s ease;
+
+  &:hover {
+    background: #333;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.inviteRules {
+  padding: 10px 0;
+  padding-left: 12px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 15px;
+  border-top: 1px solid #f1e8e8;
+}
+
+.inviteRulesTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+
+.inviteRulesList {
+  margin: 0 0 8px;
+  list-style: disc;
+  li {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+  }
+}
+
+.inviteRulesNote {
+  margin: 0;
+  color: #8b8f97;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

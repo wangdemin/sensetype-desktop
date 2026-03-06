@@ -1,0 +1,176 @@
+.menu {
+  width: 220px;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f7f9;
+  &.collapsed {
+    width: 84px;
+  }
+  flex-shrink: 0;
+}
+
+.logo {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.logoItem {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  svg {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.logoItem.logoVisible {
+  opacity: 1;
+}
+
+.menuContent {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.menu.collapsed .macLogoWrap {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menuItem {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  color: #151f29;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    gap 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-weight: 600;
+  font-size: 14px;
+
+  p {
+    width: 44px;
+    height: 100%;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eaeaea;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+
+  &:hover:not(.active) p {
+    background: #ddd;
+  }
+
+  &.active p {
+    background: #151f29;
+    color: #fff;
+  }
+
+  &.active:hover p {
+    background: #1a2735;
+  }
+}
+
+// 收起时图标位置不变（始终左对齐），仅标签淡出收起
+.menuItemLabel {
+  white-space: nowrap;
+  overflow-x: hidden;
+  max-width: 160px;
+  opacity: 1;
+  transition:
+    max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
+}
+
+.menu.collapsed .menuItemLabel {
+  max-width: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.menuBottom {
+  position: relative;
+  height: 236px;
+}
+
+.pointsCardWrap {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  padding: 0 0 4px;
+  transition: opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pointsCardWrap.pointsCardVisible {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+  transition: opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapseToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #55555e;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(15, 23, 42, 0.06);
+  }
+}
+
+.menu.collapsed .collapseToggle {
+  height: 36px;
+  margin-top: 8px;
+}

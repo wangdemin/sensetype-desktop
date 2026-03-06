@@ -1,0 +1,71 @@
+.course {
+  border-radius: 24px;
+  padding: 17px 20px 11px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: #fff;
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    p {
+      height: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      cursor: pointer;
+      margin: 0;
+      span:first-child {
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-size: 14px;
+        color: #999999;
+        transition: color 0.2s ease;
+      }
+      .underline {
+        display: none;
+        width: 23px;
+        height: 2px;
+        background: #333333;
+        border-radius: 10px;
+      }
+      &:hover:not(.active) span:first-child {
+        color: #666666;
+      }
+      &:active:not(.active) span:first-child {
+        color: #4d4d4d;
+      }
+      &:hover.active span:first-child {
+        color: #1a1a1a;
+      }
+      &:active.active span:first-child {
+        color: #000000;
+      }
+      &.active {
+        justify-content: space-between;
+        span:first-child {
+          font-weight: 600;
+          font-size: 18px;
+          color: #333333;
+        }
+        .underline {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  .content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .inputsCourse {
+      height: 128px;
+    }
+    .rewriteCourse {
+      height: 128px;
+    }
+  }
+}

@@ -1,0 +1,54 @@
+.stepsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepsContainerCompact {
+  height: 100%;
+}
+
+.stepsContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+}
+
+.stepsContentCompact {
+  gap: 16px;
+}
+
+.stepTitle {
+  font-weight: 500;
+  color: #999;
+  margin-bottom: 1px;
+}
+
+.stepTitleCompact {
+  font-size: 16px;
+}
+
+.stepTitleActive {
+  color: #333333;
+}
+
+.stepTitleInactive {
+  color: #999999;
+}
+
+.arrowIcon {
+  color: #999;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.arrowIconCompact {
+  width: 16px;
+  height: 16px;
+}
+
+.arrowIconCompleted {
+  color: #141414;
+}

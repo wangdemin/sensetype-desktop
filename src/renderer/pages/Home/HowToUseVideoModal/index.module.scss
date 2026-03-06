@@ -1,0 +1,144 @@
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes box-scale-in {
+  from {
+    opacity: 0;
+    transform: translateZ(0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  animation: overlay-fade-in 200ms ease-out;
+  will-change: opacity;
+}
+
+.box {
+  position: relative;
+  width: 80vw;
+  padding: 25px;
+  height: 80vh;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+  animation: box-scale-in 220ms ease-out;
+  display: flex;
+  flex-direction: column;
+  will-change: transform, opacity;
+}
+
+.player {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: #111111;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+
+  .playerInner {
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.video-js) {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background-color: #111111;
+
+    video {
+      object-fit: contain;
+    }
+  }
+
+  :global(.vjs-control-bar) {
+    background: rgba(0, 0, 0, 0.85);
+    color: #ffffff;
+  }
+
+  :global(.vjs-progress-control) {
+    color: #ffffff;
+  }
+
+  :global(.vjs-play-progress) {
+    background-color: #ffffff;
+  }
+
+  :global(.vjs-load-progress) {
+    background-color: rgba(255, 255, 255, 0.28);
+  }
+
+  :global(.vjs-slider) {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  :global(.vjs-big-play-button) {
+    display: none;
+  }
+}
+
+.customPlayButton {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.customPlayButtonInner {
+  opacity: 0.7;
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.loadingMask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 3;
+  pointer-events: none;
+
+  svg {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+:global(.vjs-loading-spinner) {
+  display: none !important;
+}

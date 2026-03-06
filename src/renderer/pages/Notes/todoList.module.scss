@@ -1,0 +1,751 @@
+.containerStandalone,
+.containerEmbedded {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+  color: #55555e;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.listHeader {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 34px;
+}
+
+.listTitle {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 150%;
+}
+
+.countBadge {
+  border-radius: 20px;
+  background: #f3f3f3;
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.listActions {
+  display: flex;
+  align-items: center;
+  .textButton {
+    margin-right: 10px;
+    padding: 8px 12px;
+    &:hover {
+      background: #f8fafc;
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+  }
+}
+
+.searchArea {
+  position: relative;
+  width: 180px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #e3e3e8;
+  border-radius: 8px;
+  gap: 6px;
+  position: absolute;
+  inset: 0;
+}
+
+.searchBox:focus-within {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.12);
+}
+
+.searchIcon {
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: #666666;
+  font-weight: 400;
+  line-height: 100%;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+}
+
+.searchClear {
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: #e5e5e5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555555;
+  padding: 2px;
+  margin-right: 8px;
+}
+
+.searchClear:hover {
+  color: #0f172a;
+  background: #e3e3e3;
+}
+
+.searchCloseIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats {
+  font-size: 12px;
+  color: #94a3b8;
+  padding-top: 6px;
+}
+
+.composer {
+  border-radius: 20px;
+  padding: 4px;
+  border: 1px solid #e7e7e7;
+  background: #f7f7f7;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 25px;
+}
+.groupBg {
+  background: #fff;
+  border-radius: 16px;
+  padding: 0 15px;
+}
+
+.groupTitleWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.groupTitleInput {
+  flex: 1;
+  padding: 14px 0px;
+  background: #fff;
+  outline: none;
+  color: #141414;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 150%;
+
+  &::placeholder {
+    color: #c0c4cc;
+  }
+}
+
+.charCount {
+  font-size: 12px;
+  color: #c0c4cc;
+  margin-right: 8px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.draftItemsList {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.draftItem {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #e7e7e7;
+  padding: 16px 0;
+}
+
+.draftCheckbox {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #0f172a;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0f172a;
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+
+  &:checked {
+    background-color: #0f172a;
+    border-color: #0f172a;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 0;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    &:hover {
+      background-color: #0f172a;
+      border-color: #0f172a;
+      opacity: 0.8;
+    }
+  }
+}
+
+.draftInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #0f172a;
+  background: transparent;
+  padding: 0;
+
+  &::placeholder {
+    color: #c0c4cc;
+  }
+}
+
+.removeDraftButton,
+.addDraftButton {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin-right: 5px;
+  &:hover {
+    color: red;
+  }
+}
+.addDraftButton:hover {
+  color: #0f172a;
+}
+
+.composerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 12px 3px;
+}
+
+.composerHint {
+  font-size: 12px;
+  color: #727272;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.composerHintIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: #727272;
+}
+.groupsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.groupsGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.groupsGridMasonry {
+  --masonry-row-height: 1px;
+  --masonry-row-gap: 14px;
+  grid-auto-rows: var(--masonry-row-height);
+  grid-auto-flow: row dense;
+  align-items: start;
+  row-gap: 0;
+  column-gap: 14px;
+}
+
+.groupsGridOne {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.groupsGridTwo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  .groupTitle {
+    max-width: 256px;
+  }
+}
+
+.groupsGridThree {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  .groupTitle {
+    max-width: 128px;
+  }
+}
+
+@media (max-width: 760px) {
+  .groupsGridThree {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .groupsGridTwo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .groupsGridThree {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.groupCard {
+  border-radius: 12px;
+  border: 1px solid #f2f2f2;
+  background: #f7f7f7;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+  /* 允许菜单弹层溢出显示（避免被裁剪） */
+  overflow: visible;
+  position: relative;
+}
+.pushpinIcon {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.active {
+    display: block;
+  }
+}
+
+.groupCard:hover {
+  box-shadow: 0px 4px 18px 0px #0000002e;
+  .pushpinIcon {
+    display: block;
+    cursor: pointer;
+  }
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f2f2f2;
+  background: #ffffff;
+  border-radius: 10px 10px 0 0;
+}
+
+.groupHeaderMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.groupTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 150%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.groupStats {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.groupActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.groupItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+  border-radius: 0 0 10px 10px;
+  max-height: 210px; /* 约 5 条的高度，超出出现滚动条 */
+  overflow-y: auto;
+}
+
+.groupFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: auto;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+.groupItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #fafafa;
+  }
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.checkbox {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #0f172a;
+  border-radius: 7px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0f172a;
+    transform: scale(1.1);
+  }
+
+  &:checked {
+    background-color: #0f172a;
+    border-color: #0f172a;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    &:hover {
+      background-color: #0f172a;
+      border-color: #0f172a;
+    }
+  }
+}
+
+.itemText {
+  font-size: 14px;
+  /* 截图效果：未完成接近黑色 */
+  color: #141414;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 120ms ease;
+  cursor: pointer;
+}
+
+.itemTextDone {
+  /* 完成态：弱化颜色并添加删除线 */
+  color: #666;
+  text-decoration: line-through;
+}
+
+.editInput {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionButton,
+.actionButtonGhost,
+.actionButtonDanger {
+  border: 1px solid transparent;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.actionButton {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.actionButton:hover {
+  background: #e5e7eb;
+}
+
+.actionButtonGhost {
+  background: transparent;
+  border-color: #e5e7eb;
+  color: #6b7280;
+  line-height: 28px;
+}
+
+.actionButtonGhost:hover {
+  background: #f8fafc;
+}
+
+.actionButtonDanger {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.actionButtonDanger:hover {
+  background: #fee2e2;
+}
+
+.editModal {
+  max-width: 600px;
+  width: 90vw;
+}
+
+.editModalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editGroupTitleWrapper {
+  padding-bottom: 8px;
+}
+
+.editGroupTitleInput {
+  width: 100%;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e7e7e7;
+  outline: none;
+  color: #141414;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 150%;
+
+  &::placeholder {
+    color: #c0c4cc;
+  }
+
+  &:focus {
+    border-color: #e7e7e7;
+  }
+}
+
+.editItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.editItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #e7e7e7;
+}
+
+.editCheckbox {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #0f172a;
+  border-radius: 7px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0f172a;
+    transform: scale(1.1);
+  }
+
+  &:checked {
+    background-color: #0f172a;
+    border-color: #0f172a;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 0px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    &:hover {
+      background-color: #0f172a;
+      border-color: #0f172a;
+    }
+  }
+}
+
+.editItemInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #0f172a;
+  background: transparent;
+  padding: 0;
+
+  &::placeholder {
+    color: #c0c4cc;
+  }
+}
+
+.removeEditItemButton {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+  }
+}
+
+.addEditItemButton {
+  padding: 8px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 120ms ease;
+
+  &:hover {
+    border-color: #0f172a;
+    color: #0f172a;
+    background: #f0f7ff;
+  }
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}

@@ -1,0 +1,41 @@
+.voiceStatusBar {
+  position: fixed;
+  left: 16px;
+  bottom: 24px;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.voiceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.voiceState {
+  font-weight: 700;
+}
+
+.voiceHint {
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+.voiceError {
+  color: #fecaca;
+  background: rgba(220, 38, 38, 0.18);
+  border: 1px solid rgba(252, 165, 165, 0.25);
+  padding: 6px 8px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}

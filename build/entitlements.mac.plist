@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <!-- 允许 JIT（否则 V8 可能在启动阶段 SIGTRAP） -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+
+    <!-- 允许加载第三方/自带原生模块（leveldown、uiohook-napi 等） -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+
+    <!-- 麦克风权限（Hardened Runtime 需要） -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+
+    <!-- 发布建议：关闭调试附加权限（notarization 也更友好）。如本地调试需要，可在本机单独启用。 -->
+    <key>com.apple.security.get-task-allow</key>
+    <false/>
+  </dict>
+</plist>
+
+
+

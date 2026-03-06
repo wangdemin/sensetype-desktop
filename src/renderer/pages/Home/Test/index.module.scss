@@ -1,0 +1,71 @@
+.test {
+  margin-top: 32px;
+  background: #fff;
+  border-radius: 12px;
+}
+
+.testTitle {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0d0d12;
+}
+
+.testTextAreaWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0d0d12;
+}
+
+.testTextArea {
+  width: 100%;
+  min-height: 120px;
+  line-height: 1.4;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #0d0d12;
+  background: #f8fafc;
+  resize: vertical;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #333333;
+    background: #fff;
+  }
+}
+
+.hint {
+  margin: 8px 0 16px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 400;
+  line-height: 24px;
+
+  span {
+    padding: 0 6px;
+    height: 20px;
+    line-height: 18px;
+    border: 1px solid #cbcbcb;
+    background: rgba(217, 217, 217, 0.3);
+    display: inline-block;
+    color: #333;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 0 4px;
+  }
+}

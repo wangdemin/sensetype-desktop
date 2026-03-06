@@ -1,0 +1,13 @@
+.content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border-radius: 12px;
+  padding: 40px 100px 0px;
+  width: 908px;
+  margin: 0 auto;
+  &.contentHome {
+    padding: 0;
+    background: #f8f7f9;
+  }
+}

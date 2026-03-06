@@ -1,0 +1,252 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  /* 默认背景，会被动态 style 覆盖 */
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #333;
+  border-radius: 16px;
+  user-select: none; /* 整体不可选中，防止拖拽时意外选中 */
+}
+
+/* 主题变体 */
+.themeBlue {
+  background: linear-gradient(180deg, #bcd5f9 0%, #eaf4ff 100%);
+  color: #316ac1;
+}
+
+.themePurple {
+  background: linear-gradient(180deg, #cbc3f8 0%, #e3def8 82.82%);
+  color: #462e8f;
+  .dateBadge {
+    border: 1px solid #bcb9f3;
+  }
+}
+
+.themePink {
+  background: linear-gradient(180deg, #ffc7cc 0%, #fae2e8 100%);
+  color: #bf5861;
+  .dateBadge {
+    border: 1px solid #e4757f;
+  }
+}
+
+.themeYellow {
+  background: linear-gradient(180deg, #f7dcc1 0%, #f7ecda 82.82%);
+  color: #c46520;
+  .dateBadge {
+    border: 1px solid #ffc496;
+  }
+}
+
+.themeGreen {
+  background: linear-gradient(180deg, #bfecdf 0%, #d7f1e0 100%);
+  color: #2c9354;
+  .dateBadge {
+    border: 1px solid #2d9255;
+  }
+}
+.header {
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  cursor: grab;
+  -webkit-app-region: drag;
+}
+
+.dateBadge {
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  cursor: grab;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.iconButton {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  border-radius: 50%;
+  color: inherit;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.body {
+  flex: 1;
+  padding: 0 20px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.scrollAreaLimited {
+  flex: 0 0 auto;
+}
+
+.textContent {
+  white-space: pre-wrap;
+  opacity: 0.9;
+}
+
+.noteEditor {
+  width: 100%;
+  min-height: 120px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font-size: 14px;
+  line-height: 150%;
+  user-select: text;
+  overflow: hidden; /* 配合 autosize，避免 textarea 自带滚动条 */
+
+  &::placeholder {
+    color: rgba(0, 0, 0, 0.35);
+  }
+}
+
+.noteSavingHint {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  cursor: pointer;
+
+  &.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.checked {
+    background-color: currentColor;
+
+    &::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+  }
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+.progressTrack {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 3px;
+  background-color: currentColor; /* 使用当前的文本颜色 */
+  transition: width 0.3s ease;
+}
+
+/* 进度圆点样式 (替代条形，根据图片可能更像圆点？图片底部有圆点) */
+/* 图片底部显示 "当前进展 40%" 下面是一排圆点 */
+.progressDots {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: default;
+
+  &.active {
+    background-color: currentColor;
+  }
+}
+
+.dotClickable {
+  cursor: pointer;
+}

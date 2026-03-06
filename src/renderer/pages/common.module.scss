@@ -1,0 +1,23 @@
+.page {
+  color: #0f172a;
+  height: 100%;
+  background-color: #fff;
+  overflow: auto;
+  border-radius: 8px;
+  padding: 0 0 10px;
+}
+
+.permissionGranted {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.permissionDenied {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.permissionChecking {
+  color: #6b7280;
+  font-weight: 500;
+}

@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+# Git 钩子环境 PATH 可能没有 node，先尝试加载用户环境或常见 Node 安装路径（Windows/Git Bash）
+if ! command -v node >/dev/null 2>&1; then
+  [ -f "$HOME/.bash_profile" ] && . "$HOME/.bash_profile" 2>/dev/null
+  [ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc" 2>/dev/null
+fi
+if ! command -v node >/dev/null 2>&1; then
+  if [ -n "$NVM_SYMLINK" ] && [ -x "$NVM_SYMLINK/node.exe" ] 2>/dev/null; then
+    export PATH="$NVM_SYMLINK:$PATH"
+  else
+    for p in "/c/Program Files/nodejs" "/d/Program Files/nodejs"; do
+      if [ -x "$p/node.exe" ] 2>/dev/null; then
+        export PATH="$p:$PATH"
+        break
+      fi
+    done
+  fi
+fi
+exec node_modules/.bin/commitlint --edit "$1"
+

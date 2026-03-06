@@ -1,0 +1,194 @@
+{
+  "name": "sensetype",
+  "private": true,
+  "version": "1.3.0-bate.1",
+  "packageManager": "pnpm@9.12.0",
+  "main": "dist-electron/main/index.js",
+  "scripts": {
+    "dev": "chcp 65001 && vite",
+    "dev:debug": "chcp 65001 && cross-env SENSETYPE_KEYHOOK_DEBUG=1 vite",
+    "dev:mac": "vite",
+    "dev:mac:debug": "SENSETYPE_KEYHOOK_DEBUG=1 vite",
+    "build": "vite build",
+    "rebuild-native": "node ./scripts/rebuild-native.js",
+    "rebuild-native:force": "node ./scripts/rebuild-native.js --force",
+    "rebuild-native:mac:x64": "node ./scripts/rebuild-native-mac.js --platform darwin --arch x64",
+    "rebuild-native:mac:arm64": "node ./scripts/rebuild-native-mac.js --platform darwin --arch arm64",
+    "rebuild-native:mac:x64:force": "node ./scripts/rebuild-native-mac.js --platform darwin --arch x64 --force",
+    "rebuild-native:mac:arm64:force": "node ./scripts/rebuild-native-mac.js --platform darwin --arch arm64 --force",
+    "rebuild-native:win:x64": "node ./scripts/rebuild-native-win.js --platform win32 --arch x64",
+    "clean": "node scripts/clean.js",
+    "clean:deep": "node scripts/clean.js --deep",
+    "clean:system": "bash scripts/clean-system.sh",
+    "clean:permissions": "bash scripts/clean-permissions.sh",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install",
+    "pack-win": "pnpm clean && pnpm run build && pnpm run rebuild-native:win:x64 && cross-env ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --win --x64",
+    "pack-mac:arm64": "pnpm clean && pnpm run build && arch -arm64 pnpm run rebuild-native:mac:arm64:force && arch -arm64 env -u APPLE_ID -u APPLE_APP_SPECIFIC_PASSWORD -u APPLE_TEAM_ID -u APPLE_NOTARY_KEY -u APPLE_NOTARY_KEY_ID -u APPLE_NOTARY_ISSUER ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --mac --arm64",
+    "pack-mac:x64": "pnpm clean && pnpm run build && arch -x86_64 pnpm run rebuild-native:mac:x64:force && arch -x86_64 env -u APPLE_ID -u APPLE_APP_SPECIFIC_PASSWORD -u APPLE_TEAM_ID -u APPLE_NOTARY_KEY -u APPLE_NOTARY_KEY_ID -u APPLE_NOTARY_ISSUER ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --mac --x64",
+    "pack-mac:all": "pnpm clean && pnpm run build && arch -arm64 pnpm run rebuild-native:mac:arm64:force && arch -arm64 env -u APPLE_ID -u APPLE_APP_SPECIFIC_PASSWORD -u APPLE_TEAM_ID -u APPLE_NOTARY_KEY -u APPLE_NOTARY_KEY_ID -u APPLE_NOTARY_ISSUER ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --mac --arm64 && arch -x86_64 pnpm run rebuild-native:mac:x64:force && arch -x86_64 env -u APPLE_ID -u APPLE_APP_SPECIFIC_PASSWORD -u APPLE_TEAM_ID -u APPLE_NOTARY_KEY -u APPLE_NOTARY_KEY_ID -u APPLE_NOTARY_ISSUER ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --mac --x64",
+    "pack-mac": "pnpm clean && pnpm run build && pnpm run rebuild-native:force && env -u APPLE_ID -u APPLE_APP_SPECIFIC_PASSWORD -u APPLE_TEAM_ID -u APPLE_NOTARY_KEY -u APPLE_NOTARY_KEY_ID -u APPLE_NOTARY_ISSUER ELECTRON_CACHE=.cache/electron ELECTRON_BUILDER_CACHE=.cache/electron-builder electron-builder --mac",
+    "pack-linux": "pnpm run build && electron-builder --linux"
+  },
+  "build": {
+    "forceCodeSigning": true,
+    "extends": null,
+    "npmRebuild": false,
+    "productName": "SenseAudio输入法",
+    "appId": "master.sensetype",
+    "directories": {
+      "output": "release/SenseAudio输入法-client_setup"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "public/**",
+      "node_modules/**",
+      "package.json"
+    ],
+    "afterPack": "build/afterPack-adhoc-sign.js",
+    "afterSign": "build/verify-macos-signing.js",
+    "afterAllArtifactBuild": "build/notarize-and-staple.js",
+    "mac": {
+      "artifactName": "SenseAudio AI 语音输入法-${version}-${arch}.${ext}",
+      "target": [
+        {
+          "target": "dmg"
+        }
+      ],
+      "icon": "src/assets/images/logo-512-mini.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "用于语音输入与录音转写",
+        "NSAppleEventsUsageDescription": "用于在外部应用中粘贴识别结果"
+      }
+    },
+    "protocols": [
+      {
+        "name": "SenseType Client",
+        "schemes": [
+          "sensetype-client"
+        ]
+      }
+    ],
+    "linux": {
+      "target": "deb",
+      "artifactName": "SenseAudio AI语音输入法_setup_${version}.${ext}",
+      "category": "Development",
+      "maintainer": "cyh",
+      "icon": "src/assets/images/logo-512.png"
+    },
+    "win": {
+      "requestedExecutionLevel": "requireAdministrator",
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
+      "sign": "./scripts/win-customSign.js",
+      "cscKeyPassword": "12345678",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "SenseAudio AI语音输入法-${version}-x64-Setup.${ext}",
+      "icon": "src/assets/images/logo-512.png"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "xxxxx"
+      }
+    ],
+    "nsis": {
+      "include": "build/installer.nsh",
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "SenseAudio输入法 "
+    }
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.3",
+    "@types/nedb": "^1.8.16",
+    "axios": "^1.13.2",
+    "docx": "^9.6.0",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.7.3",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.0",
+    "jszip": "^3.10.1",
+    "lamejs": "^1.2.1",
+    "leveldown": "6.1.1",
+    "nedb": "^1.8.0",
+    "node-gyp-build": "^4.8.4",
+    "path": "^0.12.7",
+    "posthog-js": "^1.335.2",
+    "pouchdb": "7.2.2",
+    "pouchdb-load": "^1.4.6",
+    "pouchdb-replication-stream": "^1.2.9",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-easy-crop": "^5.5.6",
+    "react-router-dom": "6.28.0",
+    "video.js": "^8.23.4",
+    "vite-plugin-electron": "^0.29.0",
+    "zustand": "^5.0.9"
+  },
+  "optionalDependencies": {
+    "sensetype-keyhook-mac": "link:native/sensetype-keyhook-mac",
+    "sensetype-keyhook-win": "link:native/sensetype-keyhook-win",
+    "sensetype-system-audio-mac": "link:native/sensetype-system-audio-mac",
+    "sensetype-system-audio-win": "link:native/sensetype-system-audio-win"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.3.0",
+    "@commitlint/config-conventional": "^20.3.0",
+    "@types/minimatch": "^5.1.2",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@typescript-eslint/eslint-plugin": "^8.51.0",
+    "@typescript-eslint/parser": "^8.51.0",
+    "@vitejs/plugin-react": "4.5.0",
+    "code-inspector-plugin": "^1.3.4",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.3",
+    "electron": "26.0.0",
+    "electron-builder": "^24.13.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "fs-extra": "^11.3.3",
+    "husky": "^9.1.7",
+    "minimist": "^1.2.8",
+    "nan": "^2.24.0",
+    "node-abi": "^2.19.3",
+    "node-addon-api": "^8.5.0",
+    "node-gyp": "^12.1.0",
+    "prettier": "^3.7.4",
+    "sass": "^1.80.4",
+    "typescript": "~5.8.3",
+    "vite": "^5.4.9",
+    "vite-plugin-svgr": "^4.3.0"
+  },
+  "resolutions": {
+    "leveldown": "6.0.3"
+  }
+}

@@ -1,0 +1,883 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Record Config Dialog (配置录音)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.configBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.configContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.configSections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.configSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.configLabel {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  line-height: normal;
+}
+
+// 与设置页「语音输入（长按模式）」一致：DropdownSelect + hotkeyPill 样式与交互
+.selectWrap {
+  width: 100%;
+}
+
+.dropdownSelectRoot {
+  justify-content: stretch;
+
+  button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.hotkeyPill {
+  width: 100%;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:focus,
+  &:focus-visible,
+  &:hover,
+  &:active {
+    outline: none;
+    border-color: rgba(15, 23, 42, 0.22);
+    box-shadow: none;
+  }
+}
+
+.hotkeyPill:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+// Yes / No toggle
+.toggleGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleBtn {
+  width: 72px;
+  height: 40px;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #141414;
+  background: transparent;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  box-shadow: 0 1px 1.5px 0 rgba(44, 54, 53, 0.03);
+  cursor: pointer;
+  letter-spacing: -0.14px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover:not(.toggleBtnActive) {
+    background: #f5f5f5;
+  }
+}
+
+.toggleBtnActive {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dialogs (Rename / Delete)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 20, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dialogCard {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 416px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.dialogClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 100px;
+  background: #f7f7f7;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #ebebeb;
+  }
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.dialogTitle {
+  font-size: 20px;
+  font-weight: 500;
+  color: #111;
+  margin: 0;
+  line-height: normal;
+}
+
+.dialogDesc {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  margin: 0;
+  line-height: normal;
+}
+
+.dialogInput {
+  width: 100%;
+  height: 38px;
+  padding: 8px 10px;
+  font-size: 16px;
+  color: #111;
+  background: #fff;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: #aab4c4;
+    box-shadow: 0 0 0 2px rgba(44, 53, 69, 0.08);
+  }
+}
+
+.renameInputWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.renameCharCount {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+.dialogActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dialogBtnOutline {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  background: transparent;
+  border: 1px solid #111;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.dialogBtnDark {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: #111;
+  border: 1px solid #111;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #333;
+    border-color: #333;
+  }
+
+  &:active {
+    background: #000;
+  }
+}
+
+.dialogBtnDanger {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: #ec2a4e;
+  border: 1px solid #ec2a4e;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #d42444;
+    border-color: #d42444;
+  }
+
+  &:active {
+    background: #b81d39;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Meeting list page
+// ─────────────────────────────────────────────────────────────────────────────
+
+.meetingHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #2c3545;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #3a4558;
+  }
+
+  &:active {
+    background: #1e2a38;
+  }
+}
+
+.btnSecondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  color: #2c3545;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #2c3545;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(44, 53, 69, 0.05);
+    border-color: rgba(15, 23, 42, 0.16);
+  }
+}
+
+.btnDanger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #ec2a4e;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #d42444;
+  }
+
+  &:active:not(:disabled) {
+    background: #b81d39;
+  }
+}
+
+.btnDangerDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+// ── Section header (所有文件 + search) ────────────────────────────────────────
+
+.listSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listSectionLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: #141414;
+  letter-spacing: -0.16px;
+  line-height: 1.5;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid #e3e3e8;
+  border-radius: 8px;
+  width: 160px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: #aab4c4;
+    box-shadow: 0 0 0 2px rgba(44, 53, 69, 0.06);
+  }
+}
+
+.searchIconWrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: #333;
+  background: transparent;
+  letter-spacing: -0.12px;
+
+  &::placeholder {
+    color: #999;
+  }
+}
+
+.searchClear {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// ── Cards list ────────────────────────────────────────────────────────────────
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+
+    &:hover {
+      background: #ccc;
+    }
+  }
+}
+
+.loadingMore {
+  text-align: center;
+  padding: 16px;
+  font-size: 14px;
+  color: #999;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 16px;
+  font-size: 14px;
+  color: #999;
+}
+
+.noMoreData {
+  text-align: center;
+  padding: 16px;
+  margin-top: -10px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.meetingCard {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px 16px 16px;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px 0 rgba(44, 54, 53, 0.05);
+  cursor: pointer;
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+  position: relative;
+
+  &:hover {
+    border-color: #d4d4de;
+    box-shadow: 0 4px 12px 0 rgba(44, 54, 53, 0.09);
+    background: #fafafa;
+  }
+}
+
+.meetingCardBatch {
+  &:not(.meetingCardSelected):hover {
+    background: rgba(44, 53, 69, 0.025);
+    border-color: #dddde8;
+    box-shadow: 0 2px 6px 0 rgba(44, 54, 53, 0.06);
+  }
+}
+
+.meetingCardSelected {
+  border-color: #111;
+  background: rgba(44, 53, 69, 0.03);
+  box-shadow: 0 2px 8px 0 rgba(44, 53, 69, 0.08);
+
+  &:hover {
+    border-color: #111;
+    background: rgba(44, 53, 69, 0.045);
+    box-shadow: 0 4px 12px 0 rgba(44, 53, 69, 0.1);
+  }
+}
+
+// ── Batch selection checkbox ───────────────────────────────────────────────
+
+.checkboxWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid #d2d4dc;
+  background: #f7f8fa;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
+  flex-shrink: 0;
+}
+
+.checkboxChecked {
+  background: linear-gradient(145deg, #3a4d6e 0%, #2c3545 100%);
+  border-color: #2c3545;
+  box-shadow:
+    0 2px 8px rgba(44, 53, 69, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.cardLeft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fileIconWrap {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 150%;
+  font-weight: 500;
+  width: 400px;
+  color: #111111;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration-color: currentColor;
+}
+
+.cardDuration {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.cardRight {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.cardDate {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+// ── Three-dot menu ────────────────────────────────────────────────────────────
+
+.menuWrap {
+  position: relative;
+  z-index: 1;
+}
+
+.menuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+}
+
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.contextMenu {
+  position: absolute;
+  right: -50%;
+
+  top: calc(100% + 4px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  width: 96px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(17px);
+  -webkit-backdrop-filter: blur(17px);
+  border: 1px solid rgba(218, 226, 235, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 10px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+.contextMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: -0.14px;
+  transition: background 0.12s ease;
+  width: 100%;
+  height: 28px;
+  &:first-child {
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+
+  &:not(:first-child):hover {
+    background: rgba(251, 45, 55, 0.06);
+  }
+}
+
+.contextMenuItemDanger {
+  color: #fb2d37;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page root (audio detail - existing)
+// ─────────────────────────────────────────────────────────────────────────────
+.audioDetail {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: auto !important;
+  background: #f8f7f9 !important;
+}
+
+.audioDetailContent {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Header
+// ─────────────────────────────────────────────────────────────────────────────
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e8e8ee;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0d0d12;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #8b8b9e;
+  margin: 0;
+}
+
+// Trim banner
+.trimBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff8ed;
+  border: 1px solid #fdd7a0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  flex-shrink: 0;
+}
+
+.trimBannerText {
+  font-size: 12px;
+  color: #b45309;
+  line-height: 1.4;
+}
+
+.trimBtn {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #ea6b0a;
+  }
+}
+
+// Detail panel and bottom bar styles moved to:
+// - components/MeetingPanels.module.scss
+// - components/BottomBar.module.scss
+// - components/ExportDialog.module.scss
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Permission / Recording Error
+// ─────────────────────────────────────────────────────────────────────────────
+.permissionError {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(251, 45, 55, 0.08);
+  color: #fb2d37;
+  font-size: 13px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.recordingErrorBanner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(251, 45, 55, 0.08);
+  color: #fb2d37;
+  font-size: 13px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.permissionBtn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #fb2d37;
+  background: transparent;
+  color: #fb2d37;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(251, 45, 55, 0.08);
+  }
+}

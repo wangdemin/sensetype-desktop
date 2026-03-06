@@ -1,0 +1,347 @@
+.version {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  height: 100%;
+  min-height: 0;
+}
+
+.versionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 8px;
+  position: relative;
+}
+.versionBG {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.versionHeaderContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.versionTitle {
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: rgba(20, 20, 20, 1);
+}
+
+.versionDate {
+  font-size: 14px;
+  color: rgba(114, 114, 114, 1);
+}
+.versionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: 16px;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(247, 247, 247, 1);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.sectionHeader {
+  color: rgba(20, 20, 20, 1);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 22px;
+  padding: 18px 8px;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paragraph {
+  margin: 0;
+  background-color: rgba(255, 255, 255, 1);
+  line-height: 22px;
+  color: rgba(20, 20, 20, 1);
+  padding: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  border-radius: 12px;
+}
+
+.panel {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panelTitle {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(20, 20, 20, 1);
+  line-height: 150%;
+  letter-spacing: -1%;
+}
+
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+}
+
+.step {
+  display: inline;
+  font-family: PingFang SC;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+}
+
+.stepTitle {
+  font-weight: 600;
+  color: rgba(51, 51, 51, 1);
+  margin-right: 6px;
+  white-space: nowrap;
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+
+  line-height: 150%;
+  letter-spacing: -1%;
+}
+
+.stepText {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  i {
+    border: 1px solid #cbcbcb;
+    background: rgba(217, 217, 217, 0.3);
+    padding: 3px;
+    border-radius: 4px;
+    font-style: normal;
+    color: #333;
+    font-size: 12px;
+  }
+
+  strong {
+    font-weight: 700;
+    color: rgba(51, 51, 51, 1);
+  }
+
+  p {
+    margin: 0;
+    margin-bottom: 10px;
+    line-height: 22px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.bullet {
+  position: relative;
+  padding-left: 14px;
+  font-family: PingFang SC;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+  &:before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: rgba(153, 153, 153, 1);
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: PingFang SC;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+  .paragraph {
+    padding: 0;
+  }
+}
+
+.listLabel {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(51, 51, 51, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.listText {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+}
+
+.example {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: PingFang SC;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+  padding-left: 40px;
+}
+
+.exampleLabel {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(51, 51, 51, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.exampleText {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: PingFang SC;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  position: relative;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.faqQ {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.faqQ .faqText {
+  font-weight: 600;
+  color: rgba(51, 51, 51, 1);
+}
+
+.faqA {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  position: relative;
+  padding-left: 40px;
+}
+
+.faqBullet {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  color: rgba(51, 51, 51, 1);
+  font-size: 14px;
+  line-height: 150%;
+}
+
+.faqLabel {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(51, 51, 51, 1);
+  white-space: nowrap;
+}
+
+.faqText {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1%;
+  color: rgba(102, 102, 102, 1);
+}
+
+.productWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.productTitle {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: rgba(13, 13, 18, 1);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.productDescription {
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(153, 153, 153, 1);
+  line-height: 20px;
+}
+
+/* 使用说明弹窗：比默认 Modal 更宽一些 */
+.wideModal {
+  width: min(760px, calc(100vw - 32px)) !important;
+}

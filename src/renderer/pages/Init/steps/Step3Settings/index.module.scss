@@ -1,0 +1,927 @@
+.root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 70px;
+}
+
+.title {
+  text-align: center;
+  color: #333;
+  font-style: normal;
+  font-weight: 600;
+  margin-bottom: 44px;
+  font-size: 20px;
+  line-height: 100%;
+  text-align: center;
+}
+
+.keyLabel {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid rgba(213, 213, 213, 1);
+  border-radius: 6px;
+  margin: 0 4px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.04);
+}
+
+.card {
+  width: 496px;
+  border-radius: 20px;
+  background: rgba(247, 247, 247, 1);
+  box-shadow: 0px 0px 40px 0px rgba(0, 0, 0, 0.03);
+  padding: 8px;
+
+  &.cardWithPadding {
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 12px 8px;
+    gap: 8px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cardHeaderIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background-color: rgba(231, 231, 231, 1);
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.micIconWrap,
+.keyIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: rgba(102, 102, 102, 1);
+  }
+}
+
+.cardHeaderText {
+  color: rgba(102, 102, 102, 1);
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  font-size: 14px;
+  flex: 1;
+}
+
+.bars {
+  margin-top: 18px;
+  width: 100%;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 480px;
+  height: 80px;
+  border-radius: 12px;
+  padding-top: 16px;
+  padding-right: 24px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+}
+
+.bar {
+  width: 6px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+}
+
+.barActive {
+  background: #141414;
+  transform: scaleY(1.05);
+}
+
+.hint {
+  margin-top: 20px;
+  color: rgba(153, 153, 153, 1);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.actions {
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.secondaryBtn {
+  width: 140px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #141414;
+  background: #ffffff;
+  color: #141414;
+  font-family: 'PingFang SC';
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    border-color: rgba(231, 231, 231, 1);
+    color: rgba(153, 153, 153, 1);
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 1);
+  }
+}
+%primaryBtnBase {
+  height: 40px;
+  border-radius: 10px;
+  background: #2d2d2d;
+  color: #fff;
+  font-family: 'PingFang SC';
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #000;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background: rgba(231, 231, 231, 1);
+    color: rgba(153, 153, 153, 1);
+    border-color: rgba(231, 231, 231, 1);
+    cursor: not-allowed;
+  }
+}
+.primaryBtnNew {
+  @extend %primaryBtnBase;
+  width: 140px;
+}
+.primaryBtn {
+  @extend %primaryBtnBase;
+  width: 168px;
+}
+
+.primaryBtnDisabled {
+  background: rgba(231, 231, 231, 1);
+  color: rgba(153, 153, 153, 1);
+  border-color: rgba(231, 231, 231, 1);
+  cursor: not-allowed;
+
+  &:hover {
+    filter: none;
+  }
+}
+
+.micPickerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.micPickerLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(13, 13, 18, 1);
+}
+
+.micPickerControl {
+  min-width: 220px;
+}
+
+.modalCloseBtn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: #ffffff;
+  color: rgba(13, 13, 18, 1);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 100ms ease;
+
+  &:hover {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.24);
+  }
+
+  &:active {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.3);
+    transform: scale(0.98);
+  }
+}
+
+.keyDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keyButton {
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 1);
+  border: 2px solid rgba(213, 213, 213, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.06);
+  position: relative;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+
+  .keyOption {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+      color: rgba(51, 51, 51, 1);
+    }
+  }
+}
+
+.keyGlyph {
+  font-size: 24px;
+  line-height: 1;
+  color: rgba(51, 51, 51, 1);
+}
+
+.keyButtonPressed {
+  border-color: rgba(153, 153, 153, 1);
+  background:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)),
+    linear-gradient(0deg, #dadada, #dadada);
+  border-style: solid;
+  box-shadow: 0px 1px 1.5px 0px rgba(44, 54, 53, 0.03);
+
+  // .keyText,
+  // .keyIcon {
+  //   color: rgba(255, 255, 255, 1);
+  // }
+}
+
+.keyIcon {
+  font-size: 28px;
+  line-height: 1;
+  color: rgba(51, 51, 51, 1);
+  transition: color 0.2s ease;
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.keyText {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  transition: color 0.2s ease;
+  text-align: center;
+}
+
+.hintTextLong {
+  color: rgba(153, 153, 153, 1);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  max-width: 560px;
+  padding: 5px 0;
+  text-align: center;
+}
+
+.hintNextStep {
+  margin-top: 16px;
+  color: rgba(153, 153, 153, 1);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.hintText {
+  margin-top: 10px;
+}
+.keyPlus {
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  line-height: 1;
+}
+.keyDisplayRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ═══════════════════════════════════════════════
+   Mic Test View — Two-Column Layout (Figma)
+   ═══════════════════════════════════════════════ */
+
+.micRoot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* ─── 左栏：文本 + 操作按钮 ─── */
+.micLeft {
+  width: 584px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  /* 196px = Figma title y(252) - content-area y(56) */
+  padding: 196px 0 0 52px;
+}
+
+.micTitle {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 28px;
+  color: #00020e;
+  /* Figma: title-bottom(224) → desc-top(257) = 33px */
+  margin: 0 0 33px 0;
+}
+
+.micDesc {
+  font-size: 16px;
+  color: #666;
+  width: 464px;
+  font-weight: 400;
+
+  /* Figma: desc-bottom(328) → question-top(413) = 85px */
+  margin-bottom: 85px;
+
+  p {
+    margin: 0;
+    line-height: 24px;
+  }
+}
+
+.micQuestion {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #333;
+  width: 464px;
+  /* Figma: question-bottom(437) → buttons-top(536) = 99px */
+  margin-bottom: 99px;
+}
+
+.micActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Figma: "否" button left(216) - content left(52) = 164px */
+  margin-left: 164px;
+}
+
+.micSecondaryBtn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid #141414;
+  background: #fff;
+  color: #222;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  &:hover {
+    box-shadow: 0px 0.5px 1px 0px #0000000d;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.micPrimaryBtn {
+  width: 160px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #141414;
+  background: linear-gradient(180deg, #2c2c2c 0%, #141414 100%);
+  color: #fff;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1e1e1e 100%);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ─── 右栏：音量条卡片 ─── */
+.micRight {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 额外底部留白把卡片推至视觉偏上（Figma 卡片在 40% 处，非居中） */
+  padding: 0 20px 70px 20px;
+}
+
+.micBarsCard {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0px 4px 32px rgba(0, 0, 0, 0.1),
+    0px 1px 1.5px rgba(44, 54, 53, 0.03);
+  padding: 16px 24px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.micBar {
+  width: 8px;
+  height: 47px;
+  border-radius: 10px;
+  background: rgba(71, 71, 71, 0.2);
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+  flex-shrink: 0;
+}
+
+.micBarActive {
+  background: #474747;
+  transform: scaleY(1.05);
+}
+
+/* ═══════════════════════════════════════════════
+   Key Chord Test View — Two-Column Layout (Figma)
+   ═══════════════════════════════════════════════ */
+
+.chordRoot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* ─── Left column: text + buttons ─── */
+.chordLeft {
+  width: 584px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  /* 196px = Figma title y(252) − content-area y(56) */
+  padding: 196px 0 0 52px;
+}
+
+.chordTitle {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 28px;
+  color: #00020e;
+  margin: 0 0 33px 0;
+}
+
+.chordDesc {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+
+  color: #666;
+  font-weight: 400;
+  width: 464px;
+  /* Figma: desc-bottom → hint-top ≈ 85px */
+  margin-bottom: 85px;
+
+  p {
+    margin: 0;
+    line-height: 24px;
+  }
+}
+
+.chordKeyBold {
+  font-weight: 500;
+  color: #111;
+}
+
+.chordHint {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #333;
+  width: 464px;
+  /* Figma: hint y=469, h=23 → bottom=492; buttons y=592 → gap=100px */
+  margin-bottom: 100px;
+}
+
+.chordActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Figma: "否" button left(216) − content left(52) = 164px */
+  margin-left: 164px;
+}
+
+/* "否" — outlined / white secondary button */
+.chordSecondaryBtn {
+  min-width: 90px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid #dbdbdb;
+  background: #fff;
+  color: #141414;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #999;
+  }
+
+  &:active {
+    background: #ebebeb;
+    border-color: #666;
+  }
+}
+
+/* "是，下一步" — dark gradient primary button */
+.chordPrimaryBtn {
+  width: 160px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #141414;
+  background: linear-gradient(180deg, #2c2c2c 0%, #141414 100%);
+  color: #fff;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1e1e1e 100%);
+  }
+
+  &:active:not(:disabled) {
+    background: linear-gradient(180deg, #222 0%, #0a0a0a 100%);
+  }
+
+  &:disabled {
+    background: rgba(231, 231, 231, 1);
+    color: rgba(153, 153, 153, 1);
+    border-color: rgba(231, 231, 231, 1);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+/* ─── Right column: keyboard images ─── */
+.chordRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  position: relative;
+}
+
+.chordKeyboardWrap {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Default image — always visible, stays in normal flow for sizing */
+.chordKeyImgBase {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Pressed image — absolutely positioned overlay, fades in/out.
+   Only the overlay opacity changes, so the base is never
+   semi-transparent → no background bleed / flicker. */
+.chordKeyImgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 60ms ease-out;
+  will-change: opacity;
+  backface-visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.chordKeyImgActive {
+  opacity: 1;
+}
+
+/* ─── Bottom hint text (right column) ─── */
+.chordBottomHint {
+  text-align: center;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+
+  color: #666;
+  margin-top: 40px;
+  max-width: 376px;
+
+  p {
+    margin: 0;
+    line-height: 24px;
+  }
+}
+
+.chordBottomTitle {
+  margin-bottom: 12px !important;
+}
+
+/* ═══════════════════════════════════════════════
+   Hold Key Test View — Two-Column Layout (Figma)
+   ═══════════════════════════════════════════════ */
+
+.holdRoot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* ─── Left column: text + buttons ─── */
+.holdLeft {
+  width: 584px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  /* Figma: title y(252) − content-area y(56) = 196px */
+  padding: 196px 0 0 52px;
+}
+
+.holdTitle {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 28px;
+  color: #00020e;
+  /* Figma: title bottom(280) → desc top(313) = 33px */
+  margin: 0 0 33px 0;
+}
+
+.holdDesc {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+
+  color: #666;
+  font-weight: 400;
+  width: 464px;
+  /* Figma: desc 2 lines = 48px, desc top(313) → hint top(469) = 156px
+     margin = 156 − 48 = 108px */
+  margin-bottom: 108px;
+
+  p {
+    margin: 0;
+    line-height: 24px;
+  }
+}
+
+.holdHint {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #333;
+  width: 464px;
+  /* Figma: hint bottom(492) → buttons top(592) = 100px */
+  margin-bottom: 100px;
+}
+
+.holdActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Figma: "否" button left(216) − content left(52) = 164px */
+  margin-left: 164px;
+}
+
+/* "否" — outlined white secondary button */
+.holdSecondaryBtn {
+  width: 140px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #c8c8c8;
+  background: #fff;
+  color: #141414;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #999;
+  }
+
+  &:active {
+    background: #ebebeb;
+    border-color: #666;
+  }
+}
+
+/* "是, 下一步" — dark gradient primary button */
+.holdPrimaryBtn {
+  width: 160px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #141414;
+  background: linear-gradient(180deg, #2c2c2c 0%, #141414 100%);
+  color: #fff;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1e1e1e 100%);
+  }
+
+  &:active:not(:disabled) {
+    background: linear-gradient(180deg, #222 0%, #0a0a0a 100%);
+  }
+
+  &:disabled {
+    background: rgba(231, 231, 231, 1);
+    color: rgba(153, 153, 153, 1);
+    border-color: rgba(231, 231, 231, 1);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+/* ─── Right column: keyboard images ─── */
+.holdRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  position: relative;
+}
+
+.holdKeyboardWrap {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+
+  /* Left-edge gradient fade — blends keyboard image into bg */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 88px;
+    height: 100%;
+    background: linear-gradient(to right, #f8f7f9 30%, rgba(248, 247, 249, 0) 100%);
+    z-index: 2;
+    pointer-events: none;
+  }
+}
+
+/* Default image — always visible, stays in normal flow for sizing */
+.holdKeyImgBase {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Pressed image — absolutely positioned overlay, fades in/out.
+   Only the overlay opacity changes, so the base is never
+   semi-transparent → no background bleed / flicker. */
+.holdKeyImgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 60ms ease-out;
+  will-change: opacity;
+  backface-visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.holdKeyImgActive {
+  opacity: 1;
+}
+
+/* ─── Bottom hint text (right column) ─── */
+.holdBottomHint {
+  text-align: center;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #666;
+  /* Figma: keyboard bottom(~588) → hint top(652) = ~64px */
+  margin-top: 48px;
+  max-width: 376px;
+
+  p {
+    margin: 0;
+  }
+
+  p:last-child {
+    line-height: 24px;
+  }
+}
+
+.holdBottomTitle {
+  margin-bottom: 12px !important;
+}

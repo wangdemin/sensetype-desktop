@@ -1,0 +1,52 @@
+.confettiContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  /* 更“飘”的缓动：先快后慢 */
+  animation: flowConfetti var(--dur, 1900ms) cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0ms)
+    forwards;
+}
+
+.rect {
+  border-radius: 10px;
+}
+
+.slim {
+  border-radius: 999px;
+}
+
+.parallelogram {
+  clip-path: polygon(18% 0%, 100% 0%, 82% 100%, 0% 100%);
+  border-radius: 10px;
+}
+
+.diamond {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  border-radius: 10px;
+}
+
+@keyframes flowConfetti {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0) rotate(var(--r0, 0deg))
+      scale(var(--s0, 1));
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ex, 0px), var(--ey, 0px), 0) rotate(var(--r1, 0deg))
+      scale(var(--s1, 1));
+  }
+}

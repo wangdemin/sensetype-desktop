@@ -1,0 +1,229 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d0d12;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #55555e;
+}
+
+.privacyCard {
+  margin-top: 34px;
+  border-radius: 14px;
+  background: #f3f5f7;
+  padding: 16px 16px 18px;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+
+  .searchWrap {
+    position: absolute;
+    right: 0;
+    bottom: calc(-36px - 14px);
+    display: flex;
+    align-items: center;
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: 10px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+  }
+
+  .searchInput {
+    height: 32px;
+    width: 200px;
+    border: 1px solid #e3e3e8;
+    border-radius: 8px;
+    padding: 7.5px 30px 7.5px 30px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: -1%;
+    color: #666666;
+    display: flex;
+    align-items: center;
+    transition: border-color 0.2s ease;
+  }
+
+  .searchInput:hover {
+    border-color: #8b8b8d;
+  }
+
+  .searchInput:focus {
+    border-color: #333333;
+  }
+}
+
+.privacyTitle {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+  line-height: 160%;
+}
+
+.privacyDesc {
+  font-size: 14px;
+  line-height: 160%;
+  color: #666;
+  font-weight: 400;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.dayTitle {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 150%;
+  color: #000;
+}
+
+.dayCard {
+  background: #f3f5f7;
+  border-radius: 12px;
+  border: 1px solid #e3e3e8;
+  overflow: hidden;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 34px;
+  padding: 14px 30px;
+  min-height: 52px;
+  border-top: 1px solid #e3e3e8;
+  background-color: #fff;
+}
+
+.row:hover {
+  background-color: #f3f5f7;
+}
+
+.row:first-child {
+  border-top: none;
+}
+
+.rowTime {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 150%;
+  color: #666666;
+}
+
+.rowText {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 150%;
+  color: #111111;
+}
+
+.copyBtnWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  user-select: none;
+}
+
+.copyBtn,
+.deleteBtn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  opacity: 0;
+  transition:
+    opacity 150ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 80ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: #666666;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+}
+
+.row:hover .copyBtn,
+.row:hover .deleteBtn {
+  opacity: 1;
+}
+
+.copyBtn:hover {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.18);
+}
+
+.copyBtn:active {
+  transform: translateY(1px);
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+
+.deleteBtn:active {
+  transform: translateY(1px);
+}
+
+.empty {
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px dashed rgba(15, 23, 42, 0.18);
+  background: rgba(15, 23, 42, 0.02);
+  padding: 18px 12px;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  color: #0f172a;
+}
+
+.emptyDesc {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}

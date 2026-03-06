@@ -1,0 +1,191 @@
+.header {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0 22px;
+  background: #f8f7f9;
+  user-select: none;
+  -webkit-app-region: drag;
+
+  &.isHome {
+    border-bottom: 1px solid #f1f1f1;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  .expandCollapseBtn {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 42px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: #141414;
+    transition: background 0.15s ease;
+    -webkit-app-region: no-drag;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    &:active {
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  -webkit-app-region: no-drag;
+  padding: 1px 1px 0 0;
+}
+
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 100%;
+  color: #141414;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+
+  &:active {
+    background: #d6d6d6;
+  }
+
+  &.close {
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: #e81123;
+      color: #fff;
+    }
+
+    &:active {
+      background: #c50f1f;
+      color: #fff;
+    }
+  }
+}
+
+/* ── QR Code 按钮 & 弹窗 ── */
+
+.qrCodeWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+
+  &:hover {
+    .qrCodePopup {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+}
+
+.qrCodeBtn {
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: #666;
+  transition: background 0.15s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  &:active {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.qrCodePopup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: auto;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 240px;
+  padding: 24px 24px 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s ease;
+}
+
+.qrCodeImage {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.qrCodeTitle {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.qrCodeDivider {
+  width: 100%;
+  height: 1px;
+  background: #f0f0f0;
+  margin: 12px 0;
+}
+
+.qrCodeHint {
+  font-size: 13px;
+  color: #999;
+}

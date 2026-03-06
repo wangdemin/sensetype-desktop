@@ -1,0 +1,99 @@
+/* 全局样式重置 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+html {
+  /* 设置根字体大小，方便使用 rem 单位 */
+  font-size: 16px;
+  /* 平滑滚动 */
+  scroll-behavior: smooth;
+}
+
+body {
+  /* 字体渲染优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 文本渲染优化 */
+  text-rendering: optimizeLegibility;
+  /* 默认字体 */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 列表样式重置 */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 链接样式重置 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 图片样式 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  /* 禁止图片被鼠标拖拽（Electron/Chromium 主要走 WebKit 前缀） */
+  -webkit-user-drag: none;
+  /* 可选：避免按住图片时选中/呼出系统菜单（不影响点击） */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 按钮样式重置 */
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  user-select: none;
+}
+
+/* 输入框样式重置 */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  outline: none;
+}
+
+/* 表格样式重置 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 标题样式重置 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  font-size: inherit;
+}
+
+/* 全局隐藏滚动条（保留滚动功能） */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,152 @@
+.completeStep {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  position: relative;
+  display: flex;
+  .completeStepRight {
+    width: 560px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    img {
+      margin-top: -26px;
+    }
+    p {
+      margin-top: -26px;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+      color: #666;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .title {
+    font-weight: 600;
+    font-size: 20px;
+    color: #333333;
+    margin-top: 27px;
+  }
+
+  .subtitle {
+    font-weight: 400;
+    font-size: 16px;
+    color: #333333;
+    margin-top: 16px;
+
+    span {
+      font-weight: 600;
+      font-family: PingFang SC;
+    }
+  }
+
+  .button {
+    margin-top: 114px;
+    width: 240px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #2c2c2c 0%, #141414 100%);
+    border: 1px solid #141414;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: linear-gradient(180deg, #3c3c3c 0%, #242424 100%);
+      border-color: #242424;
+    }
+
+    &:active {
+      background: linear-gradient(180deg, #1c1c1c 0%, #0a0a0a 100%);
+      border-color: #0a0a0a;
+      transform: scale(0.98);
+    }
+  }
+}
+
+.heroGroup {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fireworksLayer {
+  position: absolute;
+  inset: -40px -60px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.firework {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  opacity: 0;
+  animation: firework-pop 1.2s ease-out forwards;
+  box-shadow:
+    0 -40px #ff6b6b,
+    28px -28px #4ecdc4,
+    40px 0 #45b7d1,
+    28px 28px #ffa07a,
+    0 40px #98d8c8,
+    -28px 28px #f7dc6f,
+    -40px 0 #bb8fce,
+    -28px -28px #ff6b6b;
+}
+
+.fireworkA {
+  left: 50%;
+  top: 20%;
+  animation-delay: 0.05s;
+}
+
+.fireworkB {
+  left: 15%;
+  top: 40%;
+  animation-delay: 0.15s;
+}
+
+.fireworkC {
+  left: 85%;
+  top: 35%;
+  animation-delay: 0.25s;
+}
+
+.fireworkD {
+  left: 25%;
+  top: 70%;
+  animation-delay: 0.35s;
+}
+
+.fireworkE {
+  left: 75%;
+  top: 65%;
+  animation-delay: 0.45s;
+}
+
+@keyframes firework-pop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}

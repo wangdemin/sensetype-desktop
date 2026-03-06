@@ -1,0 +1,43 @@
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 600;
+  color: #0d0d12;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 14px;
+  line-height: 1;
+  color: #55555e;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #55555e;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #0d0d12;
+  }
+}

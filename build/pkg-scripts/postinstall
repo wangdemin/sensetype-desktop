@@ -1,0 +1,119 @@
+#!/bin/bash
+set -euo pipefail
+
+# postinstall runs as root via macOS Installer (user enters admin password).
+# Goal:
+# - Remove com.apple.quarantine from the installed .app so first launch is smoother.
+# - Best-effort add Gatekeeper allow rule via spctl (may be restricted by security policy).
+# - Log actions for troubleshooting.
+
+LOG_FILE="/var/log/sensetype-install.log"
+APP_PATH="/Applications/Sensetype.app"
+MARKER_PATH="/var/tmp/sensetype-installing"
+
+log() {
+  /bin/echo "[$(/bin/date '+%Y-%m-%d %H:%M:%S')] $*" | /usr/bin/tee -a "$LOG_FILE" >/dev/null
+}
+
+find_app_path() {
+  if [ -d "$APP_PATH" ]; then
+    /bin/echo "$APP_PATH"
+    return 0
+  fi
+
+  # Fallback: find first matching .app under /Applications (handles renamed bundles)
+  local found=""
+  found="$(/usr/bin/find /Applications -maxdepth 1 -type d -name 'Sensetype*.app' -print -quit 2>/dev/null || true)"
+  if [ -n "${found}" ] && [ -d "${found}" ]; then
+    /bin/echo "${found}"
+    return 0
+  fi
+
+  # Some installers/policies may land apps in the user's ~/Applications.
+  # postinstall runs as root; try to infer the installing user.
+  local install_user="${SUDO_USER:-}"
+  if [ -z "${install_user}" ] || [ "${install_user}" = "root" ]; then
+    install_user="$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null || true)"
+  fi
+  if [ -n "${install_user}" ] && [ "${install_user}" != "root" ]; then
+    local user_home=""
+    user_home="$(/usr/bin/dscl . -read "/Users/${install_user}" NFSHomeDirectory 2>/dev/null | /usr/bin/awk '{print $2}' || true)"
+    if [ -n "${user_home}" ] && [ -d "${user_home}/Applications" ]; then
+      found="$(/usr/bin/find "${user_home}/Applications" -maxdepth 1 -type d -name 'Sensetype*.app' -print -quit 2>/dev/null || true)"
+      if [ -n "${found}" ] && [ -d "${found}" ]; then
+        /bin/echo "${found}"
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
+}
+
+main() {
+  log "postinstall start (uid=$(id -u), user=$(id -un 2>/dev/null || echo unknown))"
+
+  cleanup() {
+    /bin/rm -f "$MARKER_PATH" >>"$LOG_FILE" 2>&1 || true
+    log "install marker cleared: ${MARKER_PATH}"
+  }
+  trap cleanup EXIT
+
+  local app=""
+  if app="$(find_app_path)"; then
+    log "found app: ${app}"
+  else
+    log "app not found under /Applications; skipping quarantine/spctl steps"
+    exit 0
+  fi
+
+  # Remove quarantine attribute recursively (best-effort)
+  # This is critical for preventing "unidentified developer" warnings
+  if /usr/bin/xattr -dr com.apple.quarantine "$app" 2>>"$LOG_FILE"; then
+    log "removed quarantine: ${app}"
+  else
+    log "WARN: failed to remove quarantine (continuing): ${app}"
+  fi
+
+  # Also remove other quarantine-related attributes that might cause warnings
+  /usr/bin/xattr -dr com.apple.macl "$app" 2>>"$LOG_FILE" || true
+  /usr/bin/xattr -dr com.apple.metadata:kMDItemWhereFroms "$app" 2>>"$LOG_FILE" || true
+
+  # Verify code signature (best-effort, log for troubleshooting)
+  if /usr/bin/codesign --verify --deep --strict --verbose=1 "$app" >>"$LOG_FILE" 2>&1; then
+    log "code signature verified: ${app}"
+  else
+    log "WARN: code signature verification failed (may be ad-hoc signed): ${app}"
+  fi
+
+  # Best-effort Gatekeeper allow rule
+  # Note: This is policy-sensitive. Some org baselines block spctl modifications.
+  # For ad-hoc signed apps, spctl may still show warnings, but this helps for local installs.
+  if [ -x /usr/sbin/spctl ]; then
+    if /usr/sbin/spctl --add --label "Sensetype" "$app" 2>>"$LOG_FILE"; then
+      log "spctl added allow rule (label=Sensetype): ${app}"
+      /usr/sbin/spctl --enable --label "Sensetype" 2>>"$LOG_FILE" || log "WARN: spctl enable failed (may be policy-restricted)"
+
+      if /usr/sbin/spctl --assess --verbose "$app" 2>>"$LOG_FILE" | /usr/bin/grep -q "accepted"; then
+        log "spctl assessment passed: ${app}"
+      else
+        log "WARN: spctl assessment may still fail (ad-hoc signed apps may require user approval)"
+      fi
+    else
+      log "WARN: spctl add failed (continuing): ${app}"
+      /usr/sbin/spctl --assess --verbose "$app" 2>>"$LOG_FILE" || log "WARN: spctl assess failed"
+    fi
+  else
+    log "WARN: spctl not found; skipping allow rule"
+  fi
+
+  # For Intel Macs specifically: ensure the app is accessible
+  if [ "$(/usr/bin/uname -m)" = "x86_64" ]; then
+    log "Intel Mac detected, applying additional trust measures"
+    /usr/bin/touch "$app" 2>>"$LOG_FILE" || true
+  fi
+
+  log "postinstall done"
+}
+
+main "$@"

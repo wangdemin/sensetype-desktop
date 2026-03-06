@@ -1,0 +1,116 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  background: #14141426;
+}
+
+.dialog {
+  position: relative;
+  width: 416px;
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  user-select: none;
+  animation: popIn 200ms ease-out;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #f7f7f7;
+  border-radius: 50%;
+  color: #141414;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background: #efefef;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  line-height: normal;
+  font-weight: 500;
+  color: #111111;
+}
+
+.body {
+  margin-right: 10px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn,
+.confirmBtn {
+  height: 40px;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-size: 14px;
+  line-height: normal;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform 80ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.cancelBtn {
+  border: 1px solid #111111;
+  background: #ffffff;
+  color: #111111;
+}
+
+.confirmBtn {
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.cancelBtn:hover,
+.confirmBtn:hover {
+  transform: translateY(-1px);
+}
+
+.cancelBtn:active,
+.confirmBtn:active {
+  transform: translateY(1px);
+}

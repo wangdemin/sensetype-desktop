@@ -1,0 +1,365 @@
+.loginContainer {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.switchingOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.switchingCard {
+  width: 220px;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 3px solid rgba(15, 23, 42, 0.15);
+  border-top-color: rgba(15, 23, 42, 0.85);
+  animation: spin 0.9s linear infinite;
+}
+
+.switchingText {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: center;
+}
+
+.loginBox {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('@/assets/images/login-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  .loginContent {
+    background: #fff;
+    padding: 68px 94px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    box-shadow: 0px 0px 40px 0px #00000005;
+    border-radius: 24px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 44px;
+  .title {
+    color: #0d0d12;
+    font-size: 24px;
+    font-weight: 600;
+  }
+}
+
+.subtitle {
+  color: #999999;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.formSection {
+  padding: 30px 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.actions {
+  position: relative;
+  width: 100%;
+}
+
+.inputGroup {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  font-size: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #cbd5e1;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.05);
+    background: #ffffff;
+  }
+
+  &:disabled {
+    background: #f8fafc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+}
+
+.codeInputWrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.codeInputWrapper .input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+}
+
+.codeButton {
+  width: 110px;
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+
+  &:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+
+  &:active:not(:disabled) {
+    background: #e2e8f0;
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f8fafc;
+  }
+}
+
+.errorMessage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 6px);
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: #dc2626;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  animation: shake 0.3s ease;
+  pointer-events: none;
+}
+
+.fieldError {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 2px);
+  font-size: 12px;
+  line-height: 16px;
+  color: #dc2626;
+  text-align: left;
+  pointer-events: none;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+.agreeRowText {
+  color: var(--Greyscale-500, #727272);
+  font-family: 'PingFang SC';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+  letter-spacing: 0.14px;
+
+  span: {
+    color: #2e85ff;
+    font-family: 'PingFang SC';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: 0.14px;
+  }
+}
+
+.loginButton {
+  margin-top: 16px;
+  display: flex;
+  width: 240px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #141414;
+  background: linear-gradient(180deg, #2c2c2c 0%, #141414 100%);
+  box-shadow: 0 0.5px 1px 0 rgba(0, 0, 0, 0.05);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    background: #334155;
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    background: #cbd5e1;
+  }
+}
+
+// 用户协议/隐私条款
+.agree,
+.privacy {
+  color: #2e85ff;
+  font-family: 'PingFang SC';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.14px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.agreeRow {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #111111;
+  font-size: 12px;
+  line-height: 18px;
+  user-select: none;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #141414;
+}
+
+// 响应式设计
+@media (max-width: 360px) {
+  .loginBox {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .logoSection {
+    padding: 32px 24px 24px;
+  }
+
+  .formSection {
+    padding: 32px 24px;
+  }
+
+  .codeInputWrapper {
+    flex-direction: column;
+  }
+
+  .codeButton {
+    width: 100%;
+  }
+}

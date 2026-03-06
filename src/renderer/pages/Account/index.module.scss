@@ -1,0 +1,34 @@
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  height: 100%;
+  min-height: 0;
+}
+.accountWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logoutSpinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(15, 23, 42, 0.18);
+  border-top-color: rgba(15, 23, 42, 0.85);
+  animation: logoutSpin 0.8s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes logoutSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

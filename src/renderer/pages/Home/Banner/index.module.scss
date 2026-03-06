@@ -1,0 +1,162 @@
+.banner {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #f5f6f8;
+}
+
+.track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 320ms ease;
+  will-change: transform;
+}
+
+.slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.content {
+  position: absolute;
+  left: 28px;
+  top: 24px;
+  max-width: 60%;
+  color: #2c2c2c;
+  margin-left: 30px;
+  user-select: none;
+}
+
+.title {
+  margin: 72px 0 16px;
+  color: #0a0a0a;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.subtitle,
+.tips li {
+  color: #999;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-bottom: 16px;
+}
+.tips1 {
+  margin-top: 18px;
+}
+.tips1 li {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 22px;
+  color: #333;
+  border: 1px solid #ffffff;
+  border-radius: 40px;
+  padding: 0 10px;
+  display: inline-flex;
+  margin-bottom: 10px;
+  align-items: center;
+  background: #ffffff4d;
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #333;
+    border-radius: 50%;
+    margin-right: 7px;
+  }
+}
+
+.actionBtn {
+  background: #2c3545;
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  width: 124px;
+  height: 46px;
+  border-radius: 59px;
+  padding: 0 20px;
+  gap: 14px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+
+  &:hover {
+    background: #2c2c2c;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+.actionArrow {
+  font-size: 26px;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  transform: translateY(-3px);
+}
+
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition:
+    width 180ms ease,
+    background 180ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.dotActive {
+  width: 18px;
+  background: #ffffff;
+}

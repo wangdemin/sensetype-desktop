@@ -1,0 +1,136 @@
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  // Keep above in-app overlays/tooltips (e.g. VoiceIndicator uses 2147483646)
+  z-index: 2147483647;
+  animation: modal-fade-in 200ms ease-out;
+}
+
+.modal {
+  position: relative;
+  width: auto;
+  max-height: calc(100vh - 32px);
+  border-radius: 20px;
+  padding: 24px;
+  background: #ffffff;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: modal-scale-in 200ms ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(15, 23, 42, 0.6);
+  cursor: pointer;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.06);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover {
+    background: rgba(15, 23, 42, 0.2);
+    color: rgba(15, 23, 42, 0.9);
+  }
+
+  &:active {
+    background: rgba(15, 23, 42, 0.1);
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+}
+
+.contentNoClose {
+  padding-right: 0;
+}
+
+.chromelessBody {
+  width: fit-content;
+  // max-width: 100%;
+}
+
+.title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: rgba(13, 13, 18, 1);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(85, 85, 94, 1);
+}
+
+.body {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(13, 13, 18, 1);
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.bodyNoHeader {
+  margin-top: 0;
+}
+
+.footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+}

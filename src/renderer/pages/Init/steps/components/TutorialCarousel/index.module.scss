@@ -1,0 +1,75 @@
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #ffffff;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.viewportPlaceholder {
+  // 首帧图片比例未探测到时，避免容器高度塌陷导致闪烁/抖动
+  // 用 clamp 保证在小宽度下不会“撑开”过多
+  min-height: clamp(96px, 22vw, 180px);
+}
+
+.track {
+  display: flex;
+  width: 100%;
+  transition:
+    transform 280ms ease,
+    opacity 180ms ease;
+  will-change: transform;
+}
+
+.trackHidden {
+  opacity: 0;
+}
+
+.trackReady {
+  opacity: 1;
+}
+
+.slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 23px;
+  height: 3px;
+  border-radius: 3px;
+  background: #d9d9d9;
+  cursor: pointer;
+  transition: all 180ms ease;
+
+  &:hover {
+    background: #262626;
+  }
+}
+
+.dotActive {
+  background: #262626;
+}
