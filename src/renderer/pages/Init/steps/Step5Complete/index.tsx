@@ -44,7 +44,7 @@ const Step5Complete: React.FC<Step5CompleteProps> = ({ onComplete }) => {
       <div className={styles.content}>
         <div className={styles.heroGroup}>
           <LoginLogoIcon />
-          <p className={styles.title}>即刻开启"语音输入"之旅！</p>
+          <p className={styles.title}>即刻开启&quot;语音输入&quot;之旅！</p>
           <p className={styles.subtitle}>
             我们将赠送您 <span>10000积分</span> 进行使用
           </p>
@@ -65,7 +65,7 @@ const Step5Complete: React.FC<Step5CompleteProps> = ({ onComplete }) => {
         <p>
           我们相信，最好的输入方式，是让你忘
           <br />
-          记"输入"这件事。
+          记&quot;输入&quot;这件事。
         </p>
       </div>
     </div>
