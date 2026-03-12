@@ -65,6 +65,11 @@ static Napi::Value Start(const Napi::CallbackInfo& info) {
   g_bridge_holder = new EventBridge(env, info[1].As<Napi::Function>());
 
   const bool ok = StartHook(g_config, g_bridge_holder);
+  if (!ok && g_bridge_holder) {
+    g_bridge_holder->Shutdown();
+    delete g_bridge_holder;
+    g_bridge_holder = nullptr;
+  }
   return Napi::Boolean::New(env, ok);
 }
 
