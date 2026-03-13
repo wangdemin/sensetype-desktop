@@ -82,6 +82,7 @@ import {
   setToken as setAuthToken,
   setUserInfo as setAuthUserInfo,
 } from '../common/authCache';
+import { setGlobalRecordListenerReady } from '../common/globalRecordDispatcher';
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 try {
@@ -397,6 +398,18 @@ class ElectronMain {
             console.log('[renderer]', payload);
           } catch {
             console.log('[renderer]');
+          }
+        });
+      } catch {
+        //
+      }
+      try {
+        ipcMain.removeAllListeners('global-record-listener-state');
+        ipcMain.on('global-record-listener-state', (event, payload: { ready?: boolean }) => {
+          try {
+            setGlobalRecordListenerReady(event.sender, payload?.ready !== false);
+          } catch {
+            // ignore
           }
         });
       } catch {

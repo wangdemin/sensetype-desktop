@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Notification, shell, systemPreferences } from 'electron';
 import type { HoldToRecordKey } from '../common/settingsStore';
 import type { HoldRecorderStatus, RecorderAction } from '../common/holdRecorderTypes';
+import { dispatchGlobalRecord } from '../common/globalRecordDispatcher';
 import { getSystemPromptSoundEnabled } from '../common/settingsStore';
 import { getKeyhookPackageName, tryLoadKeyhook } from './keyhookLoader';
 import { hideRewriteOverlay } from './rewriteOverlayWindow';
@@ -26,8 +27,9 @@ function logOptionDiag(tag: string, getWindow: () => BrowserWindow | undefined) 
       focusedWindowId: focused?.id ?? null,
       ts: Date.now(),
     };
+    void info;
     // console.info(`[option-diag][hotkey] ${tag}`, info);
-  } catch (error) {
+  } catch {
     // console.warn('[option-diag][hotkey] log failed:', error);
   }
 }
@@ -88,31 +90,14 @@ function safeSend(
     console.warn('[global-alt-recorder] window not available, cannot send event');
     return;
   }
-
-  try {
-    // 性能关键路径：
-    // - 用户按住热键时通常希望“立刻开始录音”
-    // - 但窗口在隐藏/最小化时，Electron 可能对渲染进程做 background throttling，
-    //   这会显著拖慢首次 `global-record:start` 后的 getUserMedia/初始化，从而丢掉开头语音。
-    // 因此在把 start 事件发给渲染进程之前，先强制取消节流（不显示窗口）。
-    if (action === 'start') {
-      try {
-        win.webContents?.setBackgroundThrottling?.(false);
-      } catch {
-        // ignore
-      }
-    }
-
-    const wc = win.webContents;
-    if (wc.isDestroyed()) {
-      console.warn('[global-alt-recorder] webContents is destroyed');
-      return;
-    }
-    wc.send('global-record', { action, ...(meta || {}) });
-    console.info(`[global-alt-recorder] sent event '${action}' to window`);
-  } catch (error) {
-    console.warn('[global-alt-recorder] failed to send event to window:', error);
-  }
+  dispatchGlobalRecord(
+    win,
+    { action, ...(meta || {}) },
+    {
+      disableBackgroundThrottlingForStart: true,
+      logTag: '[global-alt-recorder]',
+    },
+  );
 }
 
 let lastHintAt = 0;
@@ -235,7 +220,13 @@ export function registerGlobalHoldRecorder(
         rememberComboSignal(e?.key);
         const win = getWindow();
         if (win && !win.isDestroyed()) {
-          win.webContents.send('global-record', { action: e.type, key: e.key });
+          dispatchGlobalRecord(
+            win,
+            { action: e.type, key: e.key },
+            {
+              logTag: '[global-alt-recorder]',
+            },
+          );
         }
         return;
       }

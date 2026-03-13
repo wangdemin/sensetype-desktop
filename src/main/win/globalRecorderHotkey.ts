@@ -1,8 +1,8 @@
 import { BrowserWindow, shell } from 'electron';
-import type { WebContents } from 'electron';
 import type { HoldToRecordKey } from '../common/settingsStore';
 import type { HoldRecorderStatus, RecorderAction } from '../common/holdRecorderTypes';
 import { getSystemPromptSoundEnabled } from '../common/settingsStore';
+import { dispatchGlobalRecord } from '../common/globalRecordDispatcher';
 import { loadKeyhookOrThrow } from './keyhookLoader';
 import { hideRewriteOverlay } from './rewriteOverlayWindow';
 
@@ -39,12 +39,6 @@ function describeKey(key: HoldToRecordKey): string {
   return String(key);
 }
 
-const pendingActionAfterLoad = new WeakMap<
-  WebContents,
-  { action: RecorderAction; hotkeyMode?: 'single' | 'combo' }
->();
-const loadFlushAttached = new WeakSet<WebContents>();
-
 function safeSend(
   action: RecorderAction,
   getWindow: () => BrowserWindow | undefined,
@@ -55,50 +49,7 @@ function safeSend(
     console.warn('[global-alt-recorder] window not available, cannot send event');
     return;
   }
-
-  try {
-    const wc = win.webContents;
-    if (wc.isDestroyed()) {
-      console.warn('[global-alt-recorder] webContents is destroyed');
-      return;
-    }
-
-    if (wc.isLoading()) {
-      // Best-effort immediate send while loading. If renderer listener is already mounted,
-      // this avoids waiting for did-finish-load.
-      try {
-        wc.send('global-record', { action, ...(meta || {}) });
-      } catch {
-        // ignore immediate send failure
-      }
-
-      // Keep only the latest action during page loading and flush once after load completes.
-      pendingActionAfterLoad.set(wc, { action, ...(meta || {}) });
-      if (loadFlushAttached.has(wc)) return;
-      loadFlushAttached.add(wc);
-
-      wc.once('did-finish-load', () => {
-        loadFlushAttached.delete(wc);
-        try {
-          const pending = pendingActionAfterLoad.get(wc);
-          pendingActionAfterLoad.delete(wc);
-          if (!pending) return;
-          if (win && !win.isDestroyed() && !wc.isDestroyed()) {
-            wc.send('global-record', pending);
-            console.info(`[global-alt-recorder] flushed event '${pending.action}' after page load`);
-          }
-        } catch (error) {
-          console.warn('[global-alt-recorder] failed to send event after load:', error);
-        }
-      });
-      return;
-    }
-
-    wc.send('global-record', { action, ...(meta || {}) });
-    console.info(`[global-alt-recorder] sent event '${action}' to window`);
-  } catch (error) {
-    console.warn('[global-alt-recorder] failed to send event to window:', error);
-  }
+  dispatchGlobalRecord(win, { action, ...(meta || {}) }, { logTag: '[global-alt-recorder]' });
 }
 
 let lastHintAt = 0;
@@ -167,51 +118,7 @@ export function registerGlobalHoldRecorder(
     }
 
     const hookOpts = { delayMs, key, initialToggleState: lastToggleState, comboEnabled };
-    // Win 启动早期，渲染层 global-record 监听可能尚未挂上：
-    // native 已打印 start，但渲染没收到时就会表现为“按下没反应，过几秒才好”。
-    // 这里对 start 做短周期重放；一旦收到 stop/cancel 就立刻停止重放，避免残留 start。
-    const START_REPLAY_DELAYS_MS = [180, 520, 980, 1600, 2500, 3800, 5400, 7600];
-    let emitSeq = 0;
     let activeHotkeyMode: 'single' | 'combo' = 'single';
-    const replayTimers = new Set<NodeJS.Timeout>();
-    const clearReplayTimers = () => {
-      if (replayTimers.size === 0) return;
-      for (const t of replayTimers) {
-        try {
-          clearTimeout(t);
-        } catch {
-          //
-        }
-      }
-      replayTimers.clear();
-    };
-    const sendStartWithReplay = (hotkeyMode: 'single' | 'combo') => {
-      clearReplayTimers();
-      const seq = ++emitSeq;
-      safeSend('start', getWindow, { hotkeyMode });
-      for (const delay of START_REPLAY_DELAYS_MS) {
-        const timer = setTimeout(() => {
-          replayTimers.delete(timer);
-          if (seq !== emitSeq) return;
-          try {
-            if (typeof keyhook.isHoldDown === 'function' && !keyhook.isHoldDown()) return;
-          } catch {
-            // ignore state probe error
-          }
-          safeSend('start', getWindow, { hotkeyMode });
-        }, delay);
-        try {
-          (timer as unknown as { unref?: () => void }).unref?.();
-        } catch {
-          //
-        }
-        replayTimers.add(timer);
-      }
-    };
-    const stopStartReplay = () => {
-      emitSeq += 1;
-      clearReplayTimers();
-    };
 
     const onNativeEvent = (e: { type: 'start' | 'stop' | 'cancel' }) => {
       status.lastEventType = e?.type || 'unknown';
@@ -243,16 +150,14 @@ export function registerGlobalHoldRecorder(
           // ignore
         }
         hintOnce(`开始录音（按住 ${describeKey(key)}）`);
-        sendStartWithReplay(activeHotkeyMode);
+        safeSend('start', getWindow, { hotkeyMode: activeHotkeyMode });
       }
       if (e?.type === 'stop') {
-        stopStartReplay();
         console.info('[global-alt-recorder] keyhook event: stop');
         hintOnce('停止录音，正在识别…');
         safeSend('stop', getWindow, { hotkeyMode: activeHotkeyMode });
       }
       if (e?.type === 'cancel') {
-        stopStartReplay();
         console.info('[global-alt-recorder] keyhook event: cancel - 原生模块检测到组合键');
         hintOnce('检测到组合键：已取消语音');
         safeSend('cancel', getWindow, { hotkeyMode: activeHotkeyMode });
@@ -275,7 +180,6 @@ export function registerGlobalHoldRecorder(
             console.warn('[global-alt-recorder] error stopping keyhook:', err);
           }
         } finally {
-          stopStartReplay();
           status.backend = 'disabled';
           status.nativeIsRunning = null;
           status.disposeCount = (status.disposeCount || 0) + 1;

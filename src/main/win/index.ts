@@ -70,6 +70,7 @@ import {
   setToken as setAuthToken,
   setUserInfo as setAuthUserInfo,
 } from '../common/authCache';
+import { setGlobalRecordListenerReady } from '../common/globalRecordDispatcher';
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 try {
@@ -326,6 +327,18 @@ class ElectronMain {
             console.log('[renderer]', payload);
           } catch {
             console.log('[renderer]');
+          }
+        });
+      } catch {
+        //
+      }
+      try {
+        ipcMain.removeAllListeners('global-record-listener-state');
+        ipcMain.on('global-record-listener-state', (event, payload: { ready?: boolean }) => {
+          try {
+            setGlobalRecordListenerReady(event.sender, payload?.ready !== false);
+          } catch {
+            // ignore
           }
         });
       } catch {
@@ -1035,194 +1048,194 @@ class ElectronMain {
             if (canDetectProc) {
               const proc = String(keyhook.getForegroundProcessName?.() || '').toLowerCase();
 
-                // ── 层次 1：进程名匹配 ──
-                const procIsWeChat =
-                  proc === 'wechat.exe' ||
-                  proc === 'weixin.exe' ||
-                  proc.includes('wechat') ||
-                  proc.includes('weixin');
-                const procIsDingTalk = proc === 'dingtalk.exe' || proc.includes('dingtalk');
-                const procIsWeCom =
-                  proc === 'wxwork.exe' || proc.includes('wxwork') || proc.includes('wecom');
-                const procIsFeishu =
-                  proc === 'feishu.exe' ||
-                  proc === 'lark.exe' ||
-                  proc.includes('feishu') ||
-                  proc.includes('lark');
-                const procIsQQ =
-                  proc === 'qq.exe' ||
-                  proc === 'tim.exe' ||
-                  proc.includes('qq') ||
-                  proc.includes('tim');
+              // ── 层次 1：进程名匹配 ──
+              const procIsWeChat =
+                proc === 'wechat.exe' ||
+                proc === 'weixin.exe' ||
+                proc.includes('wechat') ||
+                proc.includes('weixin');
+              const procIsDingTalk = proc === 'dingtalk.exe' || proc.includes('dingtalk');
+              const procIsWeCom =
+                proc === 'wxwork.exe' || proc.includes('wxwork') || proc.includes('wecom');
+              const procIsFeishu =
+                proc === 'feishu.exe' ||
+                proc === 'lark.exe' ||
+                proc.includes('feishu') ||
+                proc.includes('lark');
+              const procIsQQ =
+                proc === 'qq.exe' ||
+                proc === 'tim.exe' ||
+                proc.includes('qq') ||
+                proc.includes('tim');
 
-                // ── 层次 2：完整路径匹配（进程名为空或子进程名不含关键字时的补充）──
-                let pathIsWeChat = false;
-                let pathIsDingTalk = false;
-                let pathIsWeCom = false;
-                let pathIsFeishu = false;
-                let fullPath = '';
-                if (typeof keyhook.getForegroundProcessPath === 'function') {
-                  fullPath = String(keyhook.getForegroundProcessPath?.() || '').toLowerCase();
-                  if (!procIsWeChat && fullPath) {
-                    pathIsWeChat =
-                      /[/\\]wechat[/\\]/i.test(fullPath) ||
-                      /[/\\]weixin[/\\]/i.test(fullPath) ||
-                      /[/\\]tencent[/\\](wechat|weixin)/i.test(fullPath);
-                  }
-                  if (!procIsDingTalk && fullPath) {
-                    pathIsDingTalk = /[/\\]dingtalk[/\\]/i.test(fullPath);
-                  }
-                  if (!procIsWeCom && fullPath) {
-                    pathIsWeCom =
-                      /[/\\]wxwork[/\\]/i.test(fullPath) || /[/\\]wecom[/\\]/i.test(fullPath);
-                  }
-                  if (!procIsFeishu && fullPath) {
-                    pathIsFeishu =
-                      /[/\\]feishu[/\\]/i.test(fullPath) || /[/\\]lark[/\\]/i.test(fullPath);
-                  }
+              // ── 层次 2：完整路径匹配（进程名为空或子进程名不含关键字时的补充）──
+              let pathIsWeChat = false;
+              let pathIsDingTalk = false;
+              let pathIsWeCom = false;
+              let pathIsFeishu = false;
+              let fullPath = '';
+              if (typeof keyhook.getForegroundProcessPath === 'function') {
+                fullPath = String(keyhook.getForegroundProcessPath?.() || '').toLowerCase();
+                if (!procIsWeChat && fullPath) {
+                  pathIsWeChat =
+                    /[/\\]wechat[/\\]/i.test(fullPath) ||
+                    /[/\\]weixin[/\\]/i.test(fullPath) ||
+                    /[/\\]tencent[/\\](wechat|weixin)/i.test(fullPath);
                 }
-
-                // ── 层次 3：窗口类名匹配（最可靠——微信有专属窗口类，不受版本/架构影响）──
-                let classIsWeChat = false;
-                let classIsDingTalk = false;
-                let classIsWeCom = false;
-                let winClass = '';
-                if (typeof keyhook.getForegroundWindowClassName === 'function') {
-                  winClass = String(keyhook.getForegroundWindowClassName?.() || '');
-                  // 微信已知窗口类（PC 版各历史版本 / 国内新架构版本）
-                  classIsWeChat =
-                    winClass === 'WeChatMainWndForPC' ||
-                    winClass === 'ChatWnd' ||
-                    winClass === 'WeChatLoginWndForPC' ||
-                    winClass.includes('WeChat') ||
-                    winClass.includes('Weixin');
-                  classIsDingTalk = winClass.includes('DingTalk');
-                  classIsWeCom = winClass === 'WeWorkWindow' || winClass.includes('WXWork');
+                if (!procIsDingTalk && fullPath) {
+                  pathIsDingTalk = /[/\\]dingtalk[/\\]/i.test(fullPath);
                 }
+                if (!procIsWeCom && fullPath) {
+                  pathIsWeCom =
+                    /[/\\]wxwork[/\\]/i.test(fullPath) || /[/\\]wecom[/\\]/i.test(fullPath);
+                }
+                if (!procIsFeishu && fullPath) {
+                  pathIsFeishu =
+                    /[/\\]feishu[/\\]/i.test(fullPath) || /[/\\]lark[/\\]/i.test(fullPath);
+                }
+              }
 
-                // ── 综合判定（任一维度命中即视为对应聊天应用）──
-                const isWeChatLike = procIsWeChat || pathIsWeChat || classIsWeChat;
-                const isDingTalkLike = procIsDingTalk || pathIsDingTalk || classIsDingTalk;
-                const isWeComLike = procIsWeCom || pathIsWeCom || classIsWeCom;
-                const isFeishuLike = procIsFeishu || pathIsFeishu;
-                const isQQLike = procIsQQ;
-                const isChromeBasedChat =
-                  isWeChatLike || isDingTalkLike || isWeComLike || isFeishuLike || isQQLike;
-
-                // [Diagnostic] 增强日志：打印三种检测维度，方便排查未匹配情况
-                if (isChromeBasedChat) {
-                  console.info('[inject-text] 识别为聊天应用，使用特殊注入路径。', {
-                    proc,
-                    path: fullPath.slice(-80),
-                    winClass,
-                    isWeChatLike,
-                    isDingTalkLike,
-                    isWeComLike,
-                    isFeishuLike,
-                    isQQLike,
-                  });
-                } else if (
-                  proc.includes('wechat') ||
-                  proc.includes('weixin') ||
-                  proc.includes('wx') ||
-                  fullPath.includes('wechat') ||
-                  fullPath.includes('weixin') ||
+              // ── 层次 3：窗口类名匹配（最可靠——微信有专属窗口类，不受版本/架构影响）──
+              let classIsWeChat = false;
+              let classIsDingTalk = false;
+              let classIsWeCom = false;
+              let winClass = '';
+              if (typeof keyhook.getForegroundWindowClassName === 'function') {
+                winClass = String(keyhook.getForegroundWindowClassName?.() || '');
+                // 微信已知窗口类（PC 版各历史版本 / 国内新架构版本）
+                classIsWeChat =
+                  winClass === 'WeChatMainWndForPC' ||
+                  winClass === 'ChatWnd' ||
+                  winClass === 'WeChatLoginWndForPC' ||
                   winClass.includes('WeChat') ||
-                  winClass.includes('Weixin')
-                ) {
-                  console.warn('[inject-text] ⚠️ 疑似微信但未匹配白名单，可能导致吞字。', {
-                    proc,
-                    path: fullPath.slice(-80),
-                    winClass,
-                  });
-                }
+                  winClass.includes('Weixin');
+                classIsDingTalk = winClass.includes('DingTalk');
+                classIsWeCom = winClass === 'WeWorkWindow' || winClass.includes('WXWork');
+              }
 
-                if (isChromeBasedChat) {
-                  // 优先使用 WM_CHAR 方式（彻底修复标点替代字符 bug）
-                  const useWmChar = typeof keyhook.sendTextWmChar === 'function';
-                  const sendCharFn = useWmChar ? keyhook.sendTextWmChar! : keyhook.sendText!;
-                  // 用 [...t] 按 Unicode 码点拆分（正确处理 emoji 等代理对），
-                  // 避免把 surrogate pair 拆成两个无效的 UTF-16 code unit。
-                  const codePoints = [...t];
-                  let charOk = true;
-                  for (let ci = 0; ci < codePoints.length; ci++) {
-                    const ch = codePoints[ci];
-                    // 换行在聊天应用中用 Shift+Enter，避免 Enter 直接发送消息
-                    if (ch === '\r') continue;
-                    if (ch === '\n') {
-                      if (typeof keyhook.sendShiftEnter === 'function') {
-                        const okNl = keyhook.sendShiftEnter();
-                        if (!okNl) {
-                          charOk = false;
-                          break;
-                        }
-                      } else {
-                        // 缺少换行能力时不要静默吞掉换行，直接视为失败
+              // ── 综合判定（任一维度命中即视为对应聊天应用）──
+              const isWeChatLike = procIsWeChat || pathIsWeChat || classIsWeChat;
+              const isDingTalkLike = procIsDingTalk || pathIsDingTalk || classIsDingTalk;
+              const isWeComLike = procIsWeCom || pathIsWeCom || classIsWeCom;
+              const isFeishuLike = procIsFeishu || pathIsFeishu;
+              const isQQLike = procIsQQ;
+              const isChromeBasedChat =
+                isWeChatLike || isDingTalkLike || isWeComLike || isFeishuLike || isQQLike;
+
+              // [Diagnostic] 增强日志：打印三种检测维度，方便排查未匹配情况
+              if (isChromeBasedChat) {
+                console.info('[inject-text] 识别为聊天应用，使用特殊注入路径。', {
+                  proc,
+                  path: fullPath.slice(-80),
+                  winClass,
+                  isWeChatLike,
+                  isDingTalkLike,
+                  isWeComLike,
+                  isFeishuLike,
+                  isQQLike,
+                });
+              } else if (
+                proc.includes('wechat') ||
+                proc.includes('weixin') ||
+                proc.includes('wx') ||
+                fullPath.includes('wechat') ||
+                fullPath.includes('weixin') ||
+                winClass.includes('WeChat') ||
+                winClass.includes('Weixin')
+              ) {
+                console.warn('[inject-text] ⚠️ 疑似微信但未匹配白名单，可能导致吞字。', {
+                  proc,
+                  path: fullPath.slice(-80),
+                  winClass,
+                });
+              }
+
+              if (isChromeBasedChat) {
+                // 优先使用 WM_CHAR 方式（彻底修复标点替代字符 bug）
+                const useWmChar = typeof keyhook.sendTextWmChar === 'function';
+                const sendCharFn = useWmChar ? keyhook.sendTextWmChar! : keyhook.sendText!;
+                // 用 [...t] 按 Unicode 码点拆分（正确处理 emoji 等代理对），
+                // 避免把 surrogate pair 拆成两个无效的 UTF-16 code unit。
+                const codePoints = [...t];
+                let charOk = true;
+                for (let ci = 0; ci < codePoints.length; ci++) {
+                  const ch = codePoints[ci];
+                  // 换行在聊天应用中用 Shift+Enter，避免 Enter 直接发送消息
+                  if (ch === '\r') continue;
+                  if (ch === '\n') {
+                    if (typeof keyhook.sendShiftEnter === 'function') {
+                      const okNl = keyhook.sendShiftEnter();
+                      if (!okNl) {
                         charOk = false;
                         break;
                       }
-                      continue;
-                    }
-                    charOk = sendCharFn(ch);
-                    if (!charOk) break;
-                    // WM_CHAR 方式不存在 VK_PACKET 干扰，短延迟即可；
-                    // sendText 路径下对标点使用更长延迟，减少丢字。
-                    if (useWmChar) {
-                      await sleep(5);
                     } else {
-                      const CJK_PUNCT = /[\u3000-\u303F\uFF00-\uFFEF\u2000-\u206F\u00B7]/;
-                      if (CJK_PUNCT.test(ch)) {
-                        await sleep(45);
-                      } else {
-                        await sleep(5);
-                      }
+                      // 缺少换行能力时不要静默吞掉换行，直接视为失败
+                      charOk = false;
+                      break;
+                    }
+                    continue;
+                  }
+                  charOk = sendCharFn(ch);
+                  if (!charOk) break;
+                  // WM_CHAR 方式不存在 VK_PACKET 干扰，短延迟即可；
+                  // sendText 路径下对标点使用更长延迟，减少丢字。
+                  if (useWmChar) {
+                    await sleep(5);
+                  } else {
+                    const CJK_PUNCT = /[\u3000-\u303F\uFF00-\uFFEF\u2000-\u206F\u00B7]/;
+                    if (CJK_PUNCT.test(ch)) {
+                      await sleep(45);
+                    } else {
+                      await sleep(5);
                     }
                   }
+                }
                 if (charOk) return;
                 throw new Error('native per-char injection failed for chat app');
               }
             }
 
-              // 非聊天应用：企业微信换行特殊处理（Shift+Enter）
-              // 注意：企业微信已在上方聊天应用分支统一处理，此分支仅作为
-              // getForegroundProcessName 不可用时，按同样三重检测处理企业微信换行。
-              const hasWeComHelpers =
-                typeof keyhook.sendShiftEnter === 'function' &&
-                typeof keyhook.getForegroundProcessName === 'function';
-              if (hasWeComHelpers && /[\r\n]/.test(t)) {
-                const proc2 = String(keyhook.getForegroundProcessName?.() || '').toLowerCase();
-                const fullPath2 =
-                  typeof keyhook.getForegroundProcessPath === 'function'
-                    ? String(keyhook.getForegroundProcessPath?.() || '').toLowerCase()
-                    : '';
-                const winClass2 =
-                  typeof keyhook.getForegroundWindowClassName === 'function'
-                    ? String(keyhook.getForegroundWindowClassName?.() || '')
-                    : '';
-                const isWeCom =
-                  proc2 === 'wxwork.exe' ||
-                  proc2.includes('wxwork') ||
-                  proc2.includes('wecom') ||
-                  /[/\\]wxwork[/\\]/i.test(fullPath2) ||
-                  /[/\\]wecom[/\\]/i.test(fullPath2) ||
-                  winClass2 === 'WeWorkWindow' ||
-                  winClass2.includes('WXWork');
-                if (isWeCom) {
-                  const parts = t.split(/\r\n|\n|\r/);
-                  for (let i = 0; i < parts.length; i++) {
-                    const p = parts[i] ?? '';
-                    if (p) {
-                      const ok = keyhook.sendText(p);
-                      if (!ok) throw new Error('sendText failed');
-                    }
-                    if (i < parts.length - 1) {
-                      const okNl = keyhook.sendShiftEnter?.();
-                      if (!okNl) throw new Error('sendShiftEnter failed');
-                    }
+            // 非聊天应用：企业微信换行特殊处理（Shift+Enter）
+            // 注意：企业微信已在上方聊天应用分支统一处理，此分支仅作为
+            // getForegroundProcessName 不可用时，按同样三重检测处理企业微信换行。
+            const hasWeComHelpers =
+              typeof keyhook.sendShiftEnter === 'function' &&
+              typeof keyhook.getForegroundProcessName === 'function';
+            if (hasWeComHelpers && /[\r\n]/.test(t)) {
+              const proc2 = String(keyhook.getForegroundProcessName?.() || '').toLowerCase();
+              const fullPath2 =
+                typeof keyhook.getForegroundProcessPath === 'function'
+                  ? String(keyhook.getForegroundProcessPath?.() || '').toLowerCase()
+                  : '';
+              const winClass2 =
+                typeof keyhook.getForegroundWindowClassName === 'function'
+                  ? String(keyhook.getForegroundWindowClassName?.() || '')
+                  : '';
+              const isWeCom =
+                proc2 === 'wxwork.exe' ||
+                proc2.includes('wxwork') ||
+                proc2.includes('wecom') ||
+                /[/\\]wxwork[/\\]/i.test(fullPath2) ||
+                /[/\\]wecom[/\\]/i.test(fullPath2) ||
+                winClass2 === 'WeWorkWindow' ||
+                winClass2.includes('WXWork');
+              if (isWeCom) {
+                const parts = t.split(/\r\n|\n|\r/);
+                for (let i = 0; i < parts.length; i++) {
+                  const p = parts[i] ?? '';
+                  if (p) {
+                    const ok = keyhook.sendText(p);
+                    if (!ok) throw new Error('sendText failed');
                   }
-                  return;
+                  if (i < parts.length - 1) {
+                    const okNl = keyhook.sendShiftEnter?.();
+                    if (!okNl) throw new Error('sendShiftEnter failed');
+                  }
                 }
+                return;
               }
+            }
 
             const ok = keyhook.sendText(t);
             if (ok) {
@@ -1396,29 +1409,29 @@ class ElectronMain {
       ipcMain.on(
         'rewrite-overlay-show',
         (_event, payload: { text?: string; questionText?: string }) => {
-        console.log(1231231222222223);
-        return;
-        try {
+          console.log(1231231222222223);
+          return;
+          try {
             showRewriteOverlay(payload?.text || '', {
               questionText: payload?.questionText || '',
             });
-        } catch (e) {
-          console.warn('[main] rewrite-overlay-show failed:', e);
-        }
+          } catch (e) {
+            console.warn('[main] rewrite-overlay-show failed:', e);
+          }
         },
       );
       // 渲染进程：显示重写结果悬浮窗（可等待/可回传错误）
       ipcMain.handle(
         'rewrite-overlay-show',
         async (_event, payload: { text?: string; questionText?: string }) => {
-        try {
+          try {
             await showRewriteOverlayAndWait(payload?.text || '', {
               questionText: payload?.questionText || '',
             });
-          return { success: true };
-        } catch (e: any) {
-          return { success: false, error: e?.message || String(e) };
-        }
+            return { success: true };
+          } catch (e: any) {
+            return { success: false, error: e?.message || String(e) };
+          }
         },
       );
       ipcMain.on('rewrite-overlay-hide', () => {

@@ -53,7 +53,6 @@ import {
 } from './voice/stream/warmStreamManager';
 import { createMacPreloader, createWindowsPreloader } from './voice/preload/platformPreloader';
 import {
-  normalizeRecognitionRoute,
   type RecognitionRoute,
   resolveRecognitionRouteByHotkeyMode,
   resolveRecognitionRouteByTrigger,
@@ -619,7 +618,9 @@ export function useVoiceRecognitionBase(
     const previewText =
       !message &&
       visible &&
-      (effectiveStatus === 'speaking' || effectiveStatus === 'silent' || effectiveStatus === 'loading')
+      (effectiveStatus === 'speaking' ||
+        effectiveStatus === 'silent' ||
+        effectiveStatus === 'loading')
         ? String(indicatorPreviewText || '')
         : '';
     if (holdActive && indicatorNoticeStatusRef.current) {
@@ -1412,11 +1413,21 @@ export function useVoiceRecognitionBase(
 
     // 监听全局录音事件
     ipcRenderer.on('global-record', handleGlobalRecord);
+    try {
+      ipcRenderer.send('global-record-listener-state', { ready: true });
+    } catch {
+      //
+    }
 
     // 清理函数
     return () => {
       resetSingleKeyLockState();
       clearStopRaceRecoveryTimer();
+      try {
+        ipcRenderer.send('global-record-listener-state', { ready: false });
+      } catch {
+        //
+      }
       // 移除事件监听器
       ipcRenderer.off('global-record', handleGlobalRecord);
 
