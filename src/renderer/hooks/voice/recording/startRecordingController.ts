@@ -4,6 +4,11 @@ import {
   isLikelyBluetoothMicLabel,
   resolveMacCaptureMicDevice,
 } from '@/renderer/voice/micDevicePolicy';
+import {
+  buildSpeechCaptureConstraints,
+  buildSpeechFallbackConstraints,
+  normalizePreferredMicDeviceId,
+} from '@/renderer/voice/capturePolicy';
 import { createHandleRecorderStop } from './recorderStopHandler';
 import { normalizeRecognitionRoute } from './recognitionRoute';
 import { setupLongRecordingWsOnStart } from './routes/longRecordingWsRoute';
@@ -254,28 +259,17 @@ export async function runStartRecordingFlow(ctx: any, trigger?: string): Promise
     !_inWindowSel && ctx.autoInsert && !_startCanInsertInThisWindow && !_windowFocusedAtStart
       ? ctx.ipcRenderer?.invoke?.('get-selected-text')?.catch(() => '')
       : null;
-  // 前置一次外部选区长度检查：超过限制时直接拦截，不唤起录音
   if (_externalSelP && !ctx.pendingRewriteSelectedTextRef.current) {
-    try {
-      const extSelRaw = String(
-        (await Promise.race([
-          _externalSelP,
-          new Promise<string>((r) => setTimeout(() => r(''), 150)),
-        ])) || '',
-      ).trim();
-      if (extSelRaw && extSelRaw.length > MAX_REWRITE_SELECTED_TEXT_LEN) {
-        ctx.validateRewriteSelectedText(extSelRaw);
-        ctx.desiredRecordingRef.current = false;
-        ctx.startingRef.current = false;
-        ctx.setStarting(false);
-        return;
-      }
-      if (extSelRaw) {
+    // 让外部选区读取继续在后台跑，不阻塞热键唤起录音。
+    void _externalSelP
+      .then((value) => {
+        const extSelRaw = String(value || '').trim();
+        if (!extSelRaw || ctx.pendingRewriteSelectedTextRef.current) return;
         ctx.pendingRewriteSelectedTextRef.current = extSelRaw;
-      }
-    } catch {
-      // ignore
-    }
+      })
+      .catch(() => {
+        // ignore
+      });
   }
 
   const cancelled = () => ctx.startSeqRef.current !== mySeq || !ctx.desiredRecordingRef.current;
@@ -363,44 +357,23 @@ export async function runStartRecordingFlow(ctx: any, trigger?: string): Promise
     const gumTimeoutFallbackMs = ctx.isWin ? Math.max(gumTimeoutMs, 10000) : gumTimeoutMs;
 
     // 使用缓存的首选麦克风（避免录音启动时的 IPC 延迟）
-    let preferredMicDeviceId = ctx.preferredMicDeviceIdRef.current;
-    if (
-      ctx.isWin &&
-      (preferredMicDeviceId === 'default' || preferredMicDeviceId === 'communications')
-    )
-      preferredMicDeviceId = null;
+    let preferredMicDeviceId = normalizePreferredMicDeviceId(ctx.preferredMicDeviceIdRef.current);
     if (ctx.isMac) {
       try {
         const resolved = await resolveMacCaptureMicDevice(preferredMicDeviceId);
         if (resolved.fallbackApplied && resolved.deviceId) {
-          preferredMicDeviceId = resolved.deviceId;
+          preferredMicDeviceId = normalizePreferredMicDeviceId(resolved.deviceId);
         }
       } catch {
         // ignore
       }
     }
-
-    const baseAudioConstraints = {
-      echoCancellation: true,
-      noiseSuppression: true,
-      autoGainControl: true,
-    } as const;
-
-    const audioConstraints: MediaStreamConstraints = ctx.isWin
-      ? {
-          // Win优化: 如果已经预检过权限，使用更简单的约束提升速度
-          audio: preferredMicDeviceId
-            ? { deviceId: { ideal: preferredMicDeviceId } }
-            : ctx.micPermissionGrantedRef.current
-              ? true // 已确认权限，直接使用最简单约束
-              : { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-        }
-      : {
-          // mac: 用 ideal 代替 exact，更稳（减少因设备/睡眠唤醒导致的 overconstrained/回退耗时）
-          audio: preferredMicDeviceId
-            ? { ...baseAudioConstraints, deviceId: { ideal: preferredMicDeviceId } }
-            : { ...baseAudioConstraints },
-        };
+    const audioConstraints = buildSpeechCaptureConstraints({
+      isMac: ctx.isMac,
+      isWin: ctx.isWin,
+      preferredMicDeviceId,
+      permissionGranted: ctx.micPermissionGrantedRef.current,
+    });
 
     console.log('[useVoiceRecognition] 请求麦克风权限，约束:', audioConstraints);
 
@@ -470,15 +443,7 @@ export async function runStartRecordingFlow(ctx: any, trigger?: string): Promise
       // 如果基本约束失败，尝试更宽松的约束
       console.warn('[useVoiceRecognition] 使用基本约束失败，尝试更宽松的约束:', getUserMediaError);
       try {
-        const fallbackConstraints: MediaStreamConstraints = preferredMicDeviceId
-          ? {
-              audio: {
-                deviceId: { ideal: preferredMicDeviceId },
-              },
-            }
-          : {
-              audio: true, // 最宽松的约束
-            };
+        const fallbackConstraints = buildSpeechFallbackConstraints(preferredMicDeviceId);
         console.log('[useVoiceRecognition] 尝试使用宽松约束:', fallbackConstraints);
         ctx.streamRef.current = await ctx.withTimeout(
           navigator.mediaDevices.getUserMedia(fallbackConstraints),
@@ -586,6 +551,7 @@ export async function runStartRecordingFlow(ctx: any, trigger?: string): Promise
     const timeSlice = ctx.isWin ? 10 : 100; // Windows使用10ms，macOS使用100ms
 
     const recorder = new MediaRecorder(ctx.streamRef.current, {
+      audioBitsPerSecond: 160_000,
       mimeType: selectedMimeType,
     });
 
@@ -626,33 +592,6 @@ export async function runStartRecordingFlow(ctx: any, trigger?: string): Promise
       startCanInsertInThisWindow: _startCanInsertInThisWindow,
       externalSelP: _externalSelP,
     });
-
-    // 在 recorder.start() 前等待外部选区结果（IPC 已与 getUserMedia 并行执行，此时通常已完成）
-    // 加 150ms 超时保护：如果 IPC 仍未完成，先启动录音，后续 handleRecorderStop 中有兜底检测
-    if (_externalSelP && !ctx.pendingRewriteSelectedTextRef.current) {
-      try {
-        const extSelRaw = String(
-          (await Promise.race([
-            _externalSelP,
-            new Promise<string>((r) => setTimeout(() => r(''), 150)),
-          ])) || '',
-        ).trim();
-        if (extSelRaw && extSelRaw.length > MAX_REWRITE_SELECTED_TEXT_LEN) {
-          ctx.validateRewriteSelectedText(extSelRaw);
-          ctx.desiredRecordingRef.current = false;
-          ctx.startingRef.current = false;
-          ctx.setStarting(false);
-          ctx.cleanupStream();
-          return;
-        }
-        const extSel = ctx.validateRewriteSelectedText(extSelRaw);
-        if (extSel) {
-          ctx.pendingRewriteSelectedTextRef.current = extSel;
-        }
-      } catch {
-        /* ignore */
-      }
-    }
 
     // 保存 recorder 引用并开始录音
     ctx.mediaRecorderRef.current = recorder;

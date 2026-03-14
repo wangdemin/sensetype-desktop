@@ -1,5 +1,9 @@
 import type React from 'react';
 import { resolveMacCaptureMicDevice } from '@/renderer/voice/micDevicePolicy';
+import {
+  buildSpeechCaptureConstraints,
+  normalizePreferredMicDeviceId,
+} from '@/renderer/voice/capturePolicy';
 
 type MutableRef<T> = React.MutableRefObject<T>;
 
@@ -79,31 +83,32 @@ export async function ensureWarmMicStream(args: {
   }
 
   try {
-    let warmConstraints: MediaStreamConstraints = { audio: true };
+    let preferredMicDeviceId = normalizePreferredMicDeviceId(preferredMicDeviceIdRef.current);
+    let warmConstraints: MediaStreamConstraints = buildSpeechCaptureConstraints({
+      isMac,
+      isWin,
+      preferredMicDeviceId,
+      permissionGranted: micPermissionGrantedRef.current,
+    });
     if (isMac) {
       try {
-        let preferred = preferredMicDeviceIdRef.current;
-        if (preferred === 'default' || preferred === 'communications') preferred = null;
-        const resolved = await resolveMacCaptureMicDevice(preferred);
-        const devId = resolved?.deviceId || preferred;
-        warmConstraints = devId
-          ? {
-              audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-                deviceId: { ideal: devId },
-              },
-            }
-          : {
-              audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-              },
-            };
+        const resolved = await resolveMacCaptureMicDevice(preferredMicDeviceId);
+        preferredMicDeviceId = normalizePreferredMicDeviceId(
+          resolved?.deviceId || preferredMicDeviceId,
+        );
+        warmConstraints = buildSpeechCaptureConstraints({
+          isMac,
+          isWin,
+          preferredMicDeviceId,
+          permissionGranted: micPermissionGrantedRef.current,
+        });
       } catch {
-        warmConstraints = { audio: true };
+        warmConstraints = buildSpeechCaptureConstraints({
+          isMac,
+          isWin,
+          preferredMicDeviceId: null,
+          permissionGranted: micPermissionGrantedRef.current,
+        });
       }
     }
 

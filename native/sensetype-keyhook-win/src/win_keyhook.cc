@@ -7,6 +7,7 @@
 #if defined(SENSETYPE_KEYHOOK_WIN)
 
 #include "hook_state.h"
+#include "intercept_policy.h"
 #include "vk_mapping.h"
 #include "win_utils.h"
 
@@ -118,6 +119,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
   const bool isWin  = (vk == VK_LWIN || vk == VK_RWIN);
   const bool isHold = IsHoldKey(kb, isKeyDown, isKeyUp);
   const bool comboEnabled = g_state.comboEnabled.load();
+  const bool systemInterceptionMode = IsSystemInterceptionMode(currentKey);
 
   // ─── Ctrl+Win 组合键检测 ───
 
@@ -167,24 +169,25 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
     DebugEvent(isKeyDown ? "keydown" : (isKeyUp ? "keyup" : "other"), kb, isHold);
   }
 
+  // 对 Alt/Win 这类系统键，从 hook keydown 开始立刻进入吞键窗口。
+  // 这样可以覆盖 poll 线程尚未来得及更新 holdDown 的短时间窗口。
+  if (systemInterceptionMode && isHold) {
+    if (isKeyDown) g_state.systemHoldInterceptActive.store(true);
+    if (isKeyUp) g_state.systemHoldInterceptActive.store(false);
+  }
+
   // ─── poll mode 下钩子只负责吞掉按键，不处理长按状态 ───
   // 长按状态转换完全由 poll mode 线程通过 GetAsyncKeyState 管理。
-
-  if (isHold) {
-    // 吞掉 Win 键（防止开始菜单）和 Alt 键（防止菜单栏激活）
-    if (IsWinMode(currentKey) || IsAnyAltHoldMode(currentKey)) return 1;
-    return CallNextHookEx(g_state.hook, nCode, wParam, lParam);
-  }
-
-  // 录音已开始时，吞掉其他按键（防止干扰录音）
-  if (g_state.holdDown.load() && g_state.started.load()) {
-    return 1;
-  }
-
-  // AltGr 兼容：等待右 Alt 待定启动时忽略隐式 Ctrl
-  if (IsDedicatedRightAltMode(currentKey) && g_state.holdDown.load() && !g_state.started.load()) {
-    if (isCtrl) return 1;
-  }
+  const bool holdActiveForInterception =
+    g_state.systemHoldInterceptActive.load() || g_state.holdDown.load();
+  const bool shouldSwallow = ShouldSwallowKeyboardEvent({
+    currentKey,
+    holdActiveForInterception,
+    g_state.started.load(),
+    isHold,
+    IsDedicatedRightAltMode(currentKey) && isCtrl,
+  });
+  if (shouldSwallow) return 1;
 
   return CallNextHookEx(g_state.hook, nCode, wParam, lParam);
 }
@@ -202,7 +205,6 @@ static bool StartPollModeForCurrentKey() {
   std::fflush(stderr);
 
   g_state.pollRunning.store(true);
-  g_state.hookInstallState.store(1);
   g_state.pollThread = std::thread([vks, k]() {
     uint64_t downAt = 0;
     int holdUpStreak = 0;
@@ -278,6 +280,7 @@ static bool StartPollModeForCurrentKey() {
           g_state.holdDown.store(false);
           g_state.started.store(false);
           g_state.inCombo.store(false);
+          g_state.systemHoldInterceptActive.store(false);
           std::fprintf(stderr, "[poll-mode] hold UP. wasStarted=%d wasInCombo=%d -> %s\n",
             wasStarted ? 1 : 0, wasInCombo ? 1 : 0,
             (wasStarted && !wasInCombo) ? "EmitStop" : "no-emit");
@@ -463,10 +466,12 @@ bool StartHook(const HookConfig& config, EventBridge* bridge) {
     g_state.hook = SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc,
                                       GetModuleHandleW(nullptr), 0);
     if (!g_state.hook) {
-      std::fprintf(stderr, "[keyhook] WH_KEYBOARD_LL install failed (poll mode still active)\n");
+      g_state.hookInstallState.store(-1);
+      std::fprintf(stderr, "[keyhook] WH_KEYBOARD_LL install failed\n");
       std::fflush(stderr);
       return;
     }
+    g_state.hookInstallState.store(1);
     std::fprintf(stderr, "[keyhook] WH_KEYBOARD_LL installed (swallow-only mode)\n");
     std::fflush(stderr);
     MSG msg;
@@ -478,12 +483,18 @@ bool StartHook(const HookConfig& config, EventBridge* bridge) {
       UnhookWindowsHookEx(g_state.hook);
       g_state.hook = nullptr;
     }
+    g_state.hookInstallState.store(g_state.running.load() ? -1 : 0);
   });
 
-  // 短暂等待钩子安装（非必须，poll mode 已在运行）
-  for (int i = 0; i < 40; i++) {
-    if (g_state.hook) break;
+  // 等待 hook 安装结果：只有 hook 装成功，才能保证系统键被稳定吞掉。
+  for (int i = 0; i < 100; i++) {
+    if (g_state.hookInstallState.load() != 0) break;
     Sleep(5);
+  }
+
+  if (g_state.hookInstallState.load() != 1) {
+    StopHook();
+    return false;
   }
   return true;
 }
@@ -506,8 +517,8 @@ void StopHook() {
 }
 
 bool IsHookRunning() {
-  // 使用 hookInstallState 而非 hook 指针来避免竞态/闪烁
-  return g_state.running.load() && g_state.hookInstallState.load() == 1;
+  // 只有 hook 真正安装成功，才能保证系统键拦截稳定生效。
+  return ShouldReportHookRunning(g_state.running.load(), g_state.hookInstallState.load());
 }
 
 bool IsHoldKeyDown() {

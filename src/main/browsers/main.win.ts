@@ -6,6 +6,7 @@ import axios from 'axios';
 import { WINDOW_HEIGHT, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, WINDOW_WIDTH } from './config';
 import { getIconPath } from '../common/getIconPath';
 import { clearAuth, getToken, setUserInfo } from '../common/authCache';
+import { dispatchGlobalRecord } from '../common/globalRecordDispatcher';
 import { getHoldRecorderStatus } from '../win/globalRecorderHotkey';
 import { hideRewriteOverlay } from '../win/rewriteOverlayWindow';
 import { tryLoadKeyhook } from '../win/keyhookLoader';
@@ -583,96 +584,9 @@ export default () => {
     // As a safety net, listen to focused webContents key events and drive the same start/stop IPC.
     if (process.platform === 'win32') {
       let rAltDown = false;
-      const pendingActionAfterLoad: { value: 'start' | 'stop' | null } = { value: null };
-      let loadFlushAttached = false;
-      const START_REPLAY_DELAYS_MS = [180, 520, 980, 1600, 2500, 3800, 5400, 7600];
-      let startReplaySeq = 0;
-      const startReplayTimers = new Set<NodeJS.Timeout>();
-      const clearStartReplayTimers = () => {
-        if (startReplayTimers.size === 0) return;
-        for (const t of startReplayTimers) {
-          try {
-            clearTimeout(t);
-          } catch {
-            //
-          }
-        }
-        startReplayTimers.clear();
-      };
-      const stopStartReplay = () => {
-        startReplaySeq += 1;
-        clearStartReplayTimers();
-      };
       const sendGlobalRecordNow = (action: 'start' | 'stop') => {
         if (!createdWin || createdWin.isDestroyed()) return;
-        const wc = createdWin.webContents;
-        if (wc.isDestroyed()) return;
-        if (wc.isLoading()) {
-          // Best-effort immediate send while loading: listener可能已挂上。
-          try {
-            wc.send('global-record', { action });
-            console.info(`[win32-webcontents-hotkey] sent global-record ${action}`);
-          } catch {
-            //
-          }
-          // 页面加载期间仅保留最后一个动作，避免 start/stop 监听堆积。
-          pendingActionAfterLoad.value = action;
-          if (loadFlushAttached) return;
-          loadFlushAttached = true;
-          wc.once('did-finish-load', () => {
-            loadFlushAttached = false;
-            const pending = pendingActionAfterLoad.value;
-            pendingActionAfterLoad.value = null;
-            if (!pending) return;
-            try {
-              if (!createdWin || createdWin.isDestroyed() || wc.isDestroyed()) return;
-              wc.send('global-record', { action: pending });
-              console.info(`[win32-webcontents-hotkey] flushed global-record ${pending}`);
-            } catch {
-              //
-            }
-          });
-          return;
-        }
-        try {
-          wc.send('global-record', { action });
-          console.info(`[win32-webcontents-hotkey] sent global-record ${action}`);
-        } catch {
-          //
-        }
-      };
-      const scheduleStartReplay = () => {
-        // 仅在页面加载阶段做 start 重放兜底；正常运行时避免连续 start 干扰状态。
-        try {
-          if (!createdWin || createdWin.isDestroyed()) return;
-          const wc = createdWin.webContents;
-          if (wc.isDestroyed() || !wc.isLoading()) return;
-        } catch {
-          return;
-        }
-        clearStartReplayTimers();
-        const seq = ++startReplaySeq;
-        for (const delay of START_REPLAY_DELAYS_MS) {
-          const timer = setTimeout(() => {
-            startReplayTimers.delete(timer);
-            if (seq !== startReplaySeq) return;
-            if (!rAltDown) return;
-            try {
-              if (!createdWin || createdWin.isDestroyed()) return;
-              const wc = createdWin.webContents;
-              if (wc.isDestroyed() || !wc.isLoading()) return;
-            } catch {
-              return;
-            }
-            sendGlobalRecordNow('start');
-          }, delay);
-          try {
-            (timer as unknown as { unref?: () => void }).unref?.();
-          } catch {
-            //
-          }
-          startReplayTimers.add(timer);
-        }
+        dispatchGlobalRecord(createdWin, { action }, { logTag: '[win32-webcontents-hotkey]' });
       };
       const sendGlobalRecord = (action: 'start' | 'stop') => {
         try {
@@ -709,9 +623,7 @@ export default () => {
 
           if (action === 'start') {
             sendGlobalRecordNow('start');
-            scheduleStartReplay();
           } else {
-            stopStartReplay();
             sendGlobalRecordNow('stop');
           }
 

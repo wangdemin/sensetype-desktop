@@ -1,6 +1,7 @@
 import lamejsUrl from 'lamejs/lame.min.js?url';
 
 let lameLoading: Promise<void> | null = null;
+const TARGET_MP3_KBPS = 160;
 
 type LamejsApi = {
   Mp3Encoder: new (
@@ -161,7 +162,7 @@ export async function convertToMp3(
     }
 
     // 单声道，采样率，128kbps
-    const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+    const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, TARGET_MP3_KBPS);
     const sampleBlockSize = 1152;
     const mp3Chunks: Uint8Array[] = [];
 

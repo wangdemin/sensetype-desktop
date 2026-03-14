@@ -29,6 +29,7 @@ struct HookState {
   std::atomic<uint64_t> seq{0};             // 序列号，用于取消待定的延迟启动
   std::atomic<DWORD> holdVk{0};             // 锁存的长按键 VK 码（用于稳健的 keyup 匹配）
   std::atomic<bool> holdKeyInjected{false}; // 是否注入过 Alt 键事件（原 g_altInjected）
+  std::atomic<bool> systemHoldInterceptActive{false}; // hook 侧立即拦截 Alt/Win 组合，避免等轮询线程
 
   // ─── 配置 ───
   std::atomic<uint32_t> delayMs{120};
@@ -61,7 +62,9 @@ struct HookState {
     started.store(false);
     inCombo.store(false);
     otherKeyDownCount.store(0);
+    holdDownTick.store(0);
     holdVk.store(0);
+    systemHoldInterceptActive.store(false);
   }
 
   // 完全重置所有状态（停止钩子或强制重置时调用）
