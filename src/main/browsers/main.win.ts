@@ -577,11 +577,12 @@ export default () => {
     // 默认窗口前台使用不节流；隐藏到后台后开启节流，降低长期后台运行的系统负担
     // setRendererBackgroundThrottling(false);
 
-    // Windows-only fallback:
-    // Some environments fail to deliver Right-Alt (AltGr) events reliably to the global low-level hook
-    // while the app window is focused (especially inside editable inputs/IME scenarios).
-    // As a safety net, listen to focused webContents key events and drive the same start/stop IPC.
-    if (process.platform === 'win32') {
+    // Windows webContents fallback is disabled by default to avoid competing
+    // with native keyhook event source and causing duplicate / out-of-order start-stop events.
+    // Only enable for diagnostics when explicitly requested.
+    const enableWebContentsHotkeyFallback =
+      process.env.SENSETYPE_WIN_ENABLE_WEBCONTENTS_HOTKEY_FALLBACK === '1';
+    if (process.platform === 'win32' && enableWebContentsHotkeyFallback) {
       let rAltDown = false;
       const pendingActionAfterLoad: { value: 'start' | 'stop' | null } = { value: null };
       let loadFlushAttached = false;

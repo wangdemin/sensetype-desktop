@@ -2,6 +2,16 @@ import type { HoldToRecordKey } from './settingsStore';
 
 export type RecorderAction = 'start' | 'stop' | 'cancel' | 'keydown' | 'keyup';
 
+export type GlobalRecordSource = 'native-keyhook';
+
+export type GlobalRecordPayload = {
+  action?: 'start' | 'stop' | 'cancel';
+  hotkeyMode?: 'single' | 'combo' | string;
+  eventSeq?: number;
+  eventAt?: number;
+  source?: GlobalRecordSource | string;
+};
+
 export type HoldRecorderBackend = 'native' | 'disabled';
 export type HoldRecorderEventType = RecorderAction | 'unknown';
 
