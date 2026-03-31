@@ -1,10 +1,7 @@
 import { BrowserWindow, shell } from 'electron';
 import type { WebContents } from 'electron';
 import type { HoldToRecordKey } from '../common/settingsStore';
-import type {
-  GlobalRecordPayload,
-  HoldRecorderStatus,
-} from '../common/holdRecorderTypes';
+import type { GlobalRecordPayload, HoldRecorderStatus } from '../common/holdRecorderTypes';
 import { getSystemPromptSoundEnabled } from '../common/settingsStore';
 import { loadKeyhookOrThrow } from './keyhookLoader';
 import { hideRewriteOverlay } from './rewriteOverlayWindow';
@@ -13,6 +10,8 @@ const status: HoldRecorderStatus = {
   backend: 'disabled',
   nativeVersion: null,
   nativeIsRunning: null,
+  lastEventSeq: null,
+  everStarted: false,
   lastEventType: 'unknown',
   lastEventAt: null,
   lastRestartAt: null,
@@ -171,12 +170,14 @@ export function registerGlobalHoldRecorder(
       status.lastEventAt = Date.now();
       const eventSeq = ++globalEventSeq;
       const eventAt = Date.now();
+      status.lastEventSeq = eventSeq;
 
       // Update toggle state tracking
       if (e?.type === 'start') lastToggleState = true;
       else if (e?.type === 'stop' || e?.type === 'cancel') lastToggleState = false;
 
       if (e?.type === 'start') {
+        status.everStarted = true;
         // win 下：
         // - Right-Alt 按住录音时 isHoldDown=true（单键）
         // - Ctrl+Win 组合键触发 start 时 isHoldDown=false（组合键）

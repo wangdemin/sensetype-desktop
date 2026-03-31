@@ -12,6 +12,15 @@ export type GlobalRecordPayload = {
   source?: GlobalRecordSource | string;
 };
 
+export type GlobalRecordAckPayload = {
+  eventSeq?: number;
+  eventAt?: number;
+  action?: 'start' | 'stop' | 'cancel';
+  source?: GlobalRecordSource | string;
+  accepted?: boolean;
+  rendererAt?: number;
+};
+
 export type HoldRecorderBackend = 'native' | 'disabled';
 export type HoldRecorderEventType = RecorderAction | 'unknown';
 
@@ -21,6 +30,7 @@ export type HoldRecorderStatus = {
   delayMs?: number;
   nativeVersion?: string | null;
   nativeIsRunning?: boolean | null;
+  lastEventSeq?: number | null;
   /** 是否曾经收到过 start 事件（用于避免“长期未使用”却无限自愈重注册） */
   everStarted?: boolean;
   lastEventType?: HoldRecorderEventType;

@@ -1207,6 +1207,26 @@ export function useVoiceRecognitionBase(
   useEffect(() => {
     if (!ipcRenderer) return;
 
+    const emitHotkeyEventAck = (
+      payload: GlobalRecordPayload,
+      action: 'start' | 'stop' | 'cancel',
+    ) => {
+      if (!ipcRenderer?.send) return;
+      if (payload?.source !== 'native-keyhook') return;
+      try {
+        ipcRenderer.send('hotkey-event-ack', {
+          eventSeq: payload?.eventSeq,
+          eventAt: payload?.eventAt,
+          action,
+          source: payload?.source,
+          accepted: true,
+          rendererAt: Date.now(),
+        });
+      } catch {
+        //
+      }
+    };
+
     const handleGlobalRecord = (_: any, payload: GlobalRecordPayload) => {
       const action = payload?.action;
       if (action !== 'start' && action !== 'stop' && action !== 'cancel') return;
@@ -1235,6 +1255,8 @@ export function useVoiceRecognitionBase(
         if (action === 'start') desiredRecordingRef.current = false;
         return;
       }
+
+      emitHotkeyEventAck(payload, action);
 
       const hotkeyMode = String(payload?.hotkeyMode || '').toLowerCase();
       const isSingleHotkeyMode = hotkeyMode !== 'combo';
