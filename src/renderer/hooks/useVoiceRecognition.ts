@@ -16,6 +16,7 @@ import { rewriteTextRequest } from '../../axios/http';
 import type { VoiceInputWsClient } from '@/axios/ws';
 import type { VoiceIndicatorStatus } from '@/renderer/components/VoiceIndicator';
 import { isInitKeyTestSuppressRecording } from '@/renderer/hooks/globalRecordSuppression';
+import type { GlobalRecordPayload } from '@/main/common/holdRecorderTypes';
 import { requestUserInfoRefresh } from '@/renderer/utils/refreshUserInfo';
 import { requestCheckinCalendarRefreshOnFirstUseToday } from '@/renderer/utils/checkinCalendarRefresh';
 import { track } from '@/utils/posthog';
@@ -53,7 +54,6 @@ import {
 } from './voice/stream/warmStreamManager';
 import { createMacPreloader, createWindowsPreloader } from './voice/preload/platformPreloader';
 import {
-  normalizeRecognitionRoute,
   type RecognitionRoute,
   resolveRecognitionRouteByHotkeyMode,
   resolveRecognitionRouteByTrigger,
@@ -502,6 +502,10 @@ export function useVoiceRecognitionBase(
   const singleKeyLongHoldReachedRef = useRef(false);
   const singleKeyLockedRef = useRef(false);
   const singleKeyAwaitStopReleaseRef = useRef(false);
+  // 全局热键事件序列去重（主进程 native keyhook 为单一事件源时使用）。
+  // 目的：避免重复/乱序 start-stop 事件破坏录音状态机。
+  const lastGlobalRecordEventSeqRef = useRef(0);
+  const lastGlobalRecordEventStampRef = useRef('');
   // stop 流程竞态兜底：少数环境会出现 recorder 已 inactive 但 onstop 未触发，
   // 导致 processing/sending 状态无法回落，后续 start 被永久拦截。
   const stopRaceRecoveryTimerRef = useRef<number | null>(null);
@@ -619,7 +623,9 @@ export function useVoiceRecognitionBase(
     const previewText =
       !message &&
       visible &&
-      (effectiveStatus === 'speaking' || effectiveStatus === 'silent' || effectiveStatus === 'loading')
+      (effectiveStatus === 'speaking' ||
+        effectiveStatus === 'silent' ||
+        effectiveStatus === 'loading')
         ? String(indicatorPreviewText || '')
         : '';
     if (holdActive && indicatorNoticeStatusRef.current) {
@@ -1201,20 +1207,61 @@ export function useVoiceRecognitionBase(
   useEffect(() => {
     if (!ipcRenderer) return;
 
-    const handleGlobalRecord = (
-      _: any,
-      payload: { action?: 'start' | 'stop' | 'cancel'; hotkeyMode?: 'single' | 'combo' | string },
+    const emitHotkeyEventAck = (
+      payload: GlobalRecordPayload,
+      action: 'start' | 'stop' | 'cancel',
     ) => {
+      if (!ipcRenderer?.send) return;
+      if (payload?.source !== 'native-keyhook') return;
+      try {
+        ipcRenderer.send('hotkey-event-ack', {
+          eventSeq: payload?.eventSeq,
+          eventAt: payload?.eventAt,
+          action,
+          source: payload?.source,
+          accepted: true,
+          rendererAt: Date.now(),
+        });
+      } catch {
+        //
+      }
+    };
+
+    const handleGlobalRecord = (_: any, payload: GlobalRecordPayload) => {
+      const action = payload?.action;
+      if (action !== 'start' && action !== 'stop' && action !== 'cancel') return;
+
+      // Windows 单源策略：主进程默认只转发 native keyhook 事件。
+      // 这里按 eventSeq 做幂等处理，避免重复/乱序事件把状态机拉坏。
+      if (isWin && payload?.source === 'native-keyhook') {
+        const incomingSeq = Number(payload?.eventSeq || 0);
+        if (incomingSeq > 0) {
+          if (incomingSeq <= lastGlobalRecordEventSeqRef.current) {
+            return;
+          }
+          lastGlobalRecordEventSeqRef.current = incomingSeq;
+        } else {
+          // 兼容极端情况：缺少 seq 时用 action+eventAt 兜底去重。
+          const stamp = `${action}:${String(payload?.eventAt || 0)}`;
+          if (stamp === lastGlobalRecordEventStampRef.current) {
+            return;
+          }
+          lastGlobalRecordEventStampRef.current = stamp;
+        }
+      }
+
       // 初始化“按键测试”阶段：仅用于验证按键状态，不触发真正录音链路。
       if (isInitKeyTestSuppressRecording()) {
-        if (payload?.action === 'start') desiredRecordingRef.current = false;
+        if (action === 'start') desiredRecordingRef.current = false;
         return;
       }
+
+      emitHotkeyEventAck(payload, action);
 
       const hotkeyMode = String(payload?.hotkeyMode || '').toLowerCase();
       const isSingleHotkeyMode = hotkeyMode !== 'combo';
 
-      if (payload?.action === 'start') {
+      if (action === 'start') {
         if (isSingleHotkeyMode) {
           // Win 原生层存在 start 重放机制：
           // 同一次按压期间可能收到多次 start，这里直接去重，避免“计时归零/状态抖动”。
@@ -1292,7 +1339,7 @@ export function useVoiceRecognitionBase(
           resetTimer: true,
         });
         startRecording(trigger);
-      } else if (payload?.action === 'stop') {
+      } else if (action === 'stop') {
         if (isSingleHotkeyMode) {
           const heldMs = Math.max(0, Date.now() - (singleKeyPressStartedAtRef.current || 0));
           const reachedThresholdByDuration =
@@ -1336,7 +1383,7 @@ export function useVoiceRecognitionBase(
           streamRef,
           setRecording,
         });
-      } else if (payload?.action === 'cancel') {
+      } else if (action === 'cancel') {
         resetSingleKeyLockState();
         // 组合键：取消语音（不走识别/重写）
         console.info('[useVoiceRecognition] 收到 cancel 事件，准备取消录音');

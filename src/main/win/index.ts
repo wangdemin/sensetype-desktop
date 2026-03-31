@@ -40,6 +40,7 @@ import {
   validateHoldKey,
   validateToggleAccelerator,
 } from '../../common/hotkeyRules';
+import type { GlobalRecordAckPayload, HoldRecorderEventType } from '../common/holdRecorderTypes';
 
 function describeHoldKeyForPlatform(): string {
   const cfg = getHoldToRecordConfig();
@@ -571,6 +572,37 @@ class ElectronMain {
       let voiceSessionActiveSince = 0;
       let comboRecordingActive = false;
       let disposeToggleToRecordShortcut: (() => void) | undefined;
+      const REREGISTER_MIN_INTERVAL_MS = 2500;
+      let lastAnyReRegisterAt = 0;
+      const isStopLikeEvent = (eventType?: HoldRecorderEventType) =>
+        eventType === 'stop' || eventType === 'cancel' || eventType === 'keyup';
+      const hasRecentHotkeyActivity = (ms: number) => {
+        try {
+          const s = getHoldRecorderStatus();
+          return typeof s.lastEventAt === 'number' && Date.now() - s.lastEventAt <= ms;
+        } catch {
+          return false;
+        }
+      };
+      const isLikelyRecordingInProgress = () => {
+        if (voiceSessionActive) return true;
+        try {
+          const s = getHoldRecorderStatus();
+          return s.lastEventType === 'start' && hasRecentHotkeyActivity(20_000);
+        } catch {
+          return false;
+        }
+      };
+      const isAutoRecoverReason = (reason: string) => {
+        const r = String(reason || '').toLowerCase();
+        return (
+          r.includes('window-hidden-check') ||
+          r.includes('healthcheck') ||
+          r.includes('unlock-screen') ||
+          r.includes('user-did-become-active') ||
+          r.includes('resume')
+        );
+      };
       // inject-text 专用：标记"本轮录音结束后是否需要做一次 forceReset"。
       // 只在录音停止后的第一次 inject-text 时执行一次 forceReset，
       // 避免逐 token 注入时每次都发送 11 个修饰键 key-up 事件干扰 IME（微信/钉钉丢字根因）。
@@ -656,9 +688,16 @@ class ElectronMain {
       let isRegisteringHotkey = false; // 防止并发注册
       let queuedHotkeyReRegisterReason: string | null = null;
       const registerHotkey = async (reason = 'manual') => {
+        const isAutoRecover = isAutoRecoverReason(reason);
+        const now = Date.now();
+        if (isAutoRecover) {
+          // 自动自愈路径更保守：录音会话中不做 stop/start 钩子重建，避免把会话打断。
+          if (isLikelyRecordingInProgress()) return;
+          // 统一限频，避免多个观察器在短时间内轮番重注册导致抖动。
+          if (now - lastAnyReRegisterAt < REREGISTER_MIN_INTERVAL_MS) return;
+        }
         // 防止 voiceSessionActive 卡死导致永远无法自愈（比如渲染进程卡住/窗口关闭导致不再回传 voice-feedback）
         if (voiceSessionActive) {
-          const now = Date.now();
           // 如果超过 90 秒没有收到任何 voice-feedback，就认为状态不可信，允许重注册
           if (lastVoiceFeedbackAt && now - lastVoiceFeedbackAt > 90_000) {
             console.warn(
@@ -691,6 +730,7 @@ class ElectronMain {
           return;
         }
         isRegisteringHotkey = true;
+        lastAnyReRegisterAt = now;
         try {
           await doRegisterHotkey(reason);
         } catch (error) {
@@ -725,82 +765,69 @@ class ElectronMain {
       // - 它对系统级快捷键并不可靠，且可能引入额外冲突。
       // - “按住说话期间防止触发其它快捷键”的能力应由底层 keyhook 吞键完成。
 
-      // 轻量级钩子状态检查函数（异步，不阻塞）
-      const DISABLED_AUTO_RETRY_MS = 60_000; // 原生模块缺失/加载失败时，最多每 60s 尝试一次
-      let lastDisabledAutoRetryLogAt = 0;
-      const checkHotkeyStatusLightweight = () => {
-        // 使用 setTimeout 确保异步执行，不阻塞主线程
-        setTimeout(() => {
-          try {
-            // 避免在 dispose/start 的短窗口里再触发新一轮重注册，造成状态抖动。
-            if (isRegisteringHotkey) return;
-            const status = getHoldRecorderStatus();
-            // 如果钩子未运行且不是禁用状态，尝试重启
-            if (status.backend === 'native' && status.nativeIsRunning === false) {
-              console.info('[main] window hidden: hotkey not running, attempting restart...');
-              // 重置状态，确保重启不被阻止
-              voiceSessionActive = false;
-              pendingHotkeyReRegister = false;
-              queuedHotkeyReRegisterReason = null;
-              registerHotkey('window-hidden-check');
-            } else if (status.backend === 'disabled') {
-              // 如果完全禁用，也尝试重启；但当原生模块缺失/加载失败时要退避，避免刷屏与无意义重试
-              const now = Date.now();
-              const lastRestartAt =
-                typeof status.lastRestartAt === 'number' ? status.lastRestartAt : 0;
-              const lastError = typeof status.lastError === 'string' ? status.lastError : '';
-              const looksLikeMissingNative =
-                lastError.includes('native keyhook not available') ||
-                lastError.includes('MODULE_NOT_FOUND') ||
-                lastError.includes('ERR_DLOPEN_FAILED') ||
-                lastError.includes('The specified module could not be found') ||
-                lastError.includes('找不到指定的模块');
+      // 窗口隐藏轮询式自愈默认关闭，避免与其它自愈路径叠加导致频繁重注册。
+      // 仅用于排障时手动开启：
+      // SENSETYPE_WIN_ENABLE_WINDOW_HIDDEN_AUTO_RECOVER=1
+      const enableWindowHiddenAutoRecover =
+        process.env.SENSETYPE_WIN_ENABLE_WINDOW_HIDDEN_AUTO_RECOVER === '1';
+      if (enableWindowHiddenAutoRecover) {
+        const DISABLED_AUTO_RETRY_MS = 60_000;
+        let lastDisabledAutoRetryLogAt = 0;
+        const checkHotkeyStatusLightweight = () => {
+          setTimeout(() => {
+            try {
+              if (isRegisteringHotkey) return;
+              const status = getHoldRecorderStatus();
+              if (status.backend === 'native' && status.nativeIsRunning === false) {
+                console.info('[main] window hidden: hotkey not running, attempting restart...');
+                registerHotkey('window-hidden-check');
+              } else if (status.backend === 'disabled') {
+                const now = Date.now();
+                const lastRestartAt =
+                  typeof status.lastRestartAt === 'number' ? status.lastRestartAt : 0;
+                const lastError = typeof status.lastError === 'string' ? status.lastError : '';
+                const looksLikeMissingNative =
+                  lastError.includes('native keyhook not available') ||
+                  lastError.includes('MODULE_NOT_FOUND') ||
+                  lastError.includes('ERR_DLOPEN_FAILED') ||
+                  lastError.includes('The specified module could not be found') ||
+                  lastError.includes('找不到指定的模块');
 
-              if (looksLikeMissingNative && now - lastRestartAt < DISABLED_AUTO_RETRY_MS) {
-                if (now - lastDisabledAutoRetryLogAt > DISABLED_AUTO_RETRY_MS) {
-                  lastDisabledAutoRetryLogAt = now;
-                  console.warn(
-                    '[main] hotkey disabled due to native keyhook load failure; backing off auto-retry. lastError:',
-                    lastError,
-                  );
+                if (looksLikeMissingNative && now - lastRestartAt < DISABLED_AUTO_RETRY_MS) {
+                  if (now - lastDisabledAutoRetryLogAt > DISABLED_AUTO_RETRY_MS) {
+                    lastDisabledAutoRetryLogAt = now;
+                    console.warn(
+                      '[main] hotkey disabled due to native keyhook load failure; backing off auto-retry. lastError:',
+                      lastError,
+                    );
+                  }
+                  return;
                 }
-                return;
+                console.info('[main] window hidden: hotkey disabled, attempting restart...');
+                registerHotkey('window-hidden-check');
               }
-
-              console.info('[main] window hidden: hotkey disabled, attempting restart...');
-              voiceSessionActive = false;
-              pendingHotkeyReRegister = false;
-              queuedHotkeyReRegisterReason = null;
-              registerHotkey('window-hidden-check');
+            } catch (e) {
+              console.warn('[main] Failed to check hotkey status on window hide:', e);
             }
-          } catch (e) {
-            // 静默失败，不影响其他功能
-            console.warn('[main] Failed to check hotkey status on window hide:', e);
-          }
-        }, 300); // 延迟 300ms，避免在窗口隐藏过程中立即检查
-      };
-
-      // 监听窗口隐藏事件（通过 windowCreator 获取窗口）
-      // 注意：这里使用一个轻量级的检查，避免频繁操作
-      let lastWindowHideCheck = 0;
-      const WINDOW_HIDE_CHECK_COOLDOWN = 3000; // 3秒内最多检查一次
-
-      // 通过定期检查窗口状态来触发钩子检查（轻量级，不频繁）
-      setInterval(() => {
-        try {
-          const win = this.windowCreator.getWindow();
-          if (win && !win.isDestroyed() && !win.isVisible()) {
-            // 窗口隐藏，且距离上次检查超过冷却时间
-            const now = Date.now();
-            if (now - lastWindowHideCheck > WINDOW_HIDE_CHECK_COOLDOWN) {
-              lastWindowHideCheck = now;
-              checkHotkeyStatusLightweight();
+          }, 300);
+        };
+        let lastWindowHideCheck = 0;
+        const WINDOW_HIDE_CHECK_COOLDOWN = 3000;
+        setInterval(() => {
+          try {
+            const win = this.windowCreator.getWindow();
+            if (win && !win.isDestroyed() && !win.isVisible()) {
+              const now = Date.now();
+              if (now - lastWindowHideCheck > WINDOW_HIDE_CHECK_COOLDOWN) {
+                lastWindowHideCheck = now;
+                checkHotkeyStatusLightweight();
+              }
             }
+          } catch {
+            // ignore
           }
-        } catch {
-          // 静默失败
-        }
-      }, 5000); // 每5秒检查一次窗口状态（不频繁，避免性能问题）
+        }, 5000);
+      }
 
       // NOTE(win-branch): 这个分支只专注 Windows 的“按住说话”热键稳定性。
 
@@ -856,10 +883,6 @@ class ElectronMain {
             lastHotkeyRestartAt = now;
 
             console.info(`[main] power event: ${reason}, re-registering hotkey...`);
-            // 解锁/唤醒时强制重置状态，避免被“录音进行中”阻止
-            voiceSessionActive = false;
-            pendingHotkeyReRegister = false;
-            queuedHotkeyReRegisterReason = null;
             this.reRegisterGlobalHotkey?.(reason);
           } catch (e) {
             console.warn('[main] Failed to re-register hotkey on power event (win32):', e);
@@ -935,12 +958,10 @@ class ElectronMain {
             const s = getHoldRecorderStatus();
             if (s.backend !== 'native') return;
             if (s.nativeIsRunning !== false) return;
+            if (s.everStarted !== true) return;
             const now = Date.now();
-            if (now - lastHealthCheckRestartAt < 20_000) return; // 从15秒增加到20秒
+            if (now - lastHealthCheckRestartAt < 60_000) return;
             lastHealthCheckRestartAt = now;
-            voiceSessionActive = false;
-            pendingHotkeyReRegister = false;
-            queuedHotkeyReRegisterReason = null;
             console.warn(
               '[main] win32 hotkey healthcheck: nativeIsRunning=false, re-registering...',
             );
@@ -948,7 +969,7 @@ class ElectronMain {
           } catch {
             // ignore
           }
-        }, 10000); // 从5000ms改为10000ms
+        }, 30_000);
       }
 
       // 渲染进程请求：把文本粘贴到"当前正在输入"的外部应用
@@ -1356,6 +1377,29 @@ class ElectronMain {
         },
       );
 
+      ipcMain.on('hotkey-event-ack', (_event, payload: GlobalRecordAckPayload) => {
+        try {
+          if (payload?.source !== 'native-keyhook' || payload?.accepted !== true) return;
+          const seq =
+            typeof payload?.eventSeq === 'number' && Number.isFinite(payload.eventSeq)
+              ? payload.eventSeq
+              : 0;
+          const action = payload?.action;
+          if (seq <= 0 || (action !== 'start' && action !== 'stop' && action !== 'cancel')) return;
+          if (action === 'start') {
+            voiceSessionActive = true;
+            voiceSessionActiveSince = Date.now();
+          } else {
+            voiceSessionActive = false;
+            voiceSessionActiveSince = 0;
+            comboRecordingActive = false;
+          }
+          lastVoiceFeedbackAt = Date.now();
+        } catch {
+          // ignore ack path errors
+        }
+      });
+
       // 设置页/诊断：获取热键状态
       ipcMain.handle('hotkey-get-status', async () => {
         const status = getHoldRecorderStatus();
@@ -1365,9 +1409,7 @@ class ElectronMain {
           const lastEventType = status.lastEventType;
           const lastEventAt = typeof status.lastEventAt === 'number' ? status.lastEventAt : 0;
           const shouldRecoverStaleSession =
-            (lastEventType === 'stop' || lastEventType === 'cancel' || lastEventType === 'keyup') &&
-            lastEventAt > 0 &&
-            lastEventAt >= (voiceSessionActiveSince || 0);
+            isStopLikeEvent(lastEventType) && lastEventAt > 0 && lastEventAt >= (voiceSessionActiveSince || 0);
           if (shouldRecoverStaleSession) {
             voiceSessionActive = false;
             voiceSessionActiveSince = 0;
